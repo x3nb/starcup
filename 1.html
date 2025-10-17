@@ -3,320 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Director's Cut: Spiderweb Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <title>Chimera Cats Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Lora:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* General Styles */
         body {
             margin: 0;
             padding: 0;
             background-color: black;
-            color: #fff;
+            color: white;
+            overflow: hidden;
             font-family: 'Cinzel', serif;
-            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        /* Background with Tiny Bubbles */
-        #background {
-            position: fixed;
+        #initial-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        #title-text {
+            font-size: 72px;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(to right, cornflowerblue, indigo, deeppurple);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        #title-text::after {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            pointer-events: none; /* Bubbles don't interfere with clicks */
+            background: radial-gradient(circle, cornflowerblue 0%, indigo 50%, deeppurple 100%);
+            opacity: 0.3;
+            filter: blur(10px);
+            animation: wisps 5s infinite alternate;
         }
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, cornflowerblue 0%, indigo 70%);
-            opacity: 0.5;
-            animation: float 10s infinite ease-in-out;
+
+        @keyframes wisps {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.2; }
+            100% { transform: scale(1.1) rotate(5deg); opacity: 0.5; }
         }
+
+        #cafe-image {
+            width: 250px;
+            height: 250px;
+            margin-top: 20px;
+            cursor: pointer;
+            object-fit: cover;
+            animation: float 3s ease-in-out infinite;
+        }
+
         @keyframes float {
-            0% { transform: translateY(0) scale(1); opacity: 0.5; }
-            50% { transform: translateY(-100vh) scale(1.5); opacity: 0.2; }
-            100% { transform: translateY(-200vh) scale(2); opacity: 0; }
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0); }
         }
 
-        /* Generate bubbles dynamically via JS */
-        /* (We'll add this in JavaScript) */
-
-        /* Font Gradient (Cornflower Blue to Indigo) */
-        h1, h2, a {
-            background: linear-gradient(45deg, cornflowerblue, indigo);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-family: 'Cinzel', serif;
+        #spiderweb-emoji {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            font-size: 48px;
+            cursor: pointer;
+            animation: glow 2s infinite alternate;
+            z-index: 1000;
         }
 
-        /* Spider Styles */
-        #spider {
+        #menu-icon {
             position: fixed;
             top: 20px;
             right: 20px;
             font-size: 48px;
             cursor: pointer;
-            transition: transform 0.3s;
-        }
-        #spider.shake {
-            animation: shake 0.5s;
-        }
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        /* Drawer Styles */
-        #drawer {
-            position: fixed;
-            top: -200px; /* Hidden initially */
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            transition: top 0.5s ease-in-out;
+            animation: glow 2s infinite alternate;
             z-index: 1000;
         }
-        #drawer.active {
-            top: 0; /* Drops down */
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px cornflowerblue, 0 0 10px indigo; }
+            100% { text-shadow: 0 0 10px deeppurple, 0 0 20px cornflowerblue; }
         }
-        .menu-content, .player-content {
+
+        #music-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(to bottom, deeppurple, black);
+            color: white;
             padding: 20px;
-            text-align: center;
+            box-shadow: 0 0 10px indigo;
+            transition: right 0.5s ease;
+            overflow-y: auto;
+            z-index: 2000;
         }
-        #nav-menu ul {
-            list-style: none;
-            padding: 0;
+
+        #music-drawer.open {
+            right: 0;
         }
-        #nav-menu li {
+
+        .playlist-item {
             margin: 10px 0;
+            cursor: pointer;
+            transition: color 0.3s, text-shadow 0.3s;
         }
-        #nav-menu a {
-            text-decoration: none;
-            font-size: 24px;
-            display: block;
-            transition: color 0.3s;
-        }
-        #nav-menu a:hover {
+
+        .playlist-item.active {
+            color: cornflowerblue;
             text-shadow: 0 0 10px cornflowerblue;
         }
 
-        /* Web Animation (for spider spinning web) */
-        .web-line {
+        #close-drawer {
             position: absolute;
-            width: 2px;
-            height: 0; /* Starts hidden */
-            background: radial-gradient(circle, cornflowerblue 0%, indigo 100%);
-            transition: height 0.5s, opacity 0.5s;
-            z-index: 999;
-        }
-
-        /* Music Player Styles */
-        #music-player {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #playlist {
-            max-height: 150px;
-            overflow-y: auto;
-            width: 80%;
-            margin: 10px 0;
-        }
-        .track {
-            padding: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .track.active {
-            background: linear-gradient(45deg, cornflowerblue, indigo);
-            color: black;
-            border-radius: 5px;
-        }
-        button {
-            margin: 5px;
-            padding: 10px 20px;
-            background: linear-gradient(45deg, cornflowerblue, indigo);
+            top: 10px;
+            right: 10px;
+            background: none;
             border: none;
             color: white;
             cursor: pointer;
+            font-size: 20px;
         }
 
-        /* Content Sections */
-        main {
-            padding: 50px;
-            margin-top: 100px; /* Space for drawer */
-        }
-        section {
-            margin: 50px 0;
+        #chatbot-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
             padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            opacity: 0;
-            transition: opacity 0.5s;
+            box-shadow: 0 0 20px deeppurple;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
         }
-        section.active {
-            opacity: 1;
+
+        #chatbot-modal span {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #chatbot-modal input, #chatbot-modal button, #speed-slider {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+        }
+
+        #main-menu {
+            position: fixed;
+            top: 10px;
+            right: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px deeppurple;
+            display: none;
+            z-index: 1500;
+        }
+
+        #credits-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            display: none;
+            overflow: hidden;
+        }
+
+        #credits-content {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            font-family: 'Lora', serif;
+            font-size: 24px;
+            line-height: 1.5;
+            text-align: center;
+            color: transparent;
+            background: linear-gradient(to right, lavender, cornflowerblue);
+            -webkit-background-clip: text;
+            background-clip: text;
+            white-space: pre-wrap;
+            transform: translateY(100%);
+            animation: none;
+        }
+
+        #pause-button, #resume-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 4000;
+            display: none;
+        }
+
+        @keyframes scrollCredits {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(-100%); }
         }
     </style>
 </head>
 <body>
-    <div id="background"></div> <!-- Bubble container -->
-    <div id="spider" onclick="toggleDrawer()">🕷️</div>
-    <div id="drawer" class="hidden">
-        <div id="nav-menu" class="menu-content">
-            <ul>
-                <li><a href="#about" data-target="about">About</a></li>
-                <li><a href="#lore" data-target="lore">Lore</a></li>
-                <li><a href="#movie-time" data-target="movie-time">Movie Time</a></li>
-                <li><a href="#characters" data-target="characters">Characters</a></li>
-                <li><a href="#cafe" data-target="cafe">Cafe</a></li>
-                <li><a href="#join" data-target="join">Join For Full Access</a></li>
-            </ul>
-        </div>
-        <div id="music-player" class="player-content hidden">
-            <div id="playlist">
-                <div class="track" data-src="assets/audio/track1.mp3">Track 1</div>
-                <div class="track" data-src="assets/audio/track2.mp3">Track 2</div>
-                <div class="track" data-src="assets/audio/track3.mp3">Track 3</div>
-                <div class="track" data-src="assets/audio/track4.mp3">Track 4</div>
-            </div>
-            <audio id="audio" src="assets/audio/track1.mp3"></audio>
-            <button id="play-pause">Play</button>
-            <button id="next">Next</button>
-        </div>
-    </div>
+   <!-- CHIMERA CATS CAFE - LEGENDARY CREDITS -->
+<div id="credits-container">
+  <button id="pause-button" onclick="pauseCredits()">Pause</button>
+  <button id="resume-button" onclick="resumeCredits()">Resume</button>
+  <div id="credits-content">
+    CHIMERA CATS CAFÉ<br>
+    A Legendary Tale<br><br>
 
-    <main>
-        <h1>Director's Cut: Epic Spiderweb Adventure</h1>
-        <section id="about">This is the About section. Dive into the story behind our cinematic universe.</section>
-        <section id="lore">Explore the Lore: Ancient secrets and thrilling plots await.</section>
-        <section id="movie-time">Movie Time: Watch exclusive clips and trailers here.</section>
-        <section id="characters">Meet the Characters: Heroes, villains, and everything in between.</section>
-        <section id="cafe">Visit the Cafe: Relax with themed merchandise and exclusives.</section>
-        <section id="join">
-            <h2>Join For Full Access</h2>
-            <p>Sign up now for premium content! <button onclick="alert('Sign-up successful!')">Sign Up</button></p>
-        </section>
-    </main>
+    Directed by<br>
+    ÉLODIE LUMIÈRE<br><br>
 
-    <script>
-        // Generate bubbles for background
-        const background = document.getElementById('background');
-        for (let i = 0; i < 50; i++) {  // 50 bubbles
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.style.width = Math.random() * 20 + 10 + 'px';  // 10-30px
-            bubble.style.height = bubble.style.width;
-            bubble.style.left = Math.random() * 100 + '%';
-            bubble.style.animationDuration = Math.random() * 5 + 5 + 's';  // 5-10s
-            bubble.style.animationDelay = Math.random() * 5 + 's';
-            background.appendChild(bubble);
+    Written by<br>
+    AURÉLIEN NOIR<br><br>
+
+    Starring<br>
+    YESHUA, Guardian of Shadows .......... Played by MARCEL GAUDIN<br>
+    LUNA, Dream-Weaver Cat ............... Voiced by ISABELLE RENAUD<br>
+    SHADOW, Phantom Prowler .............. Voiced by PIERRE LEBLANC<br>
+    MYST, the Illusionist ................ Voiced by SOPHIE DUPONT<br>
+    DR. VIKTOR GRAVE, the Obsessed Scientist ... Played by ALEXANDRE MOREAU<br>
+    Café Patrons and Allies .............. Ensemble Cast: Parisian Locals<br><br>
+
+    Music Composed by<br>
+    CLAUDIA VIOLETTE<br>
+    Featuring the haunting theme “Whispers of the Chimera”<br>
+    Performed by the Paris Nocturne Orchestra<br><br>
+
+    Produced by<br>
+    Atelier des Rêves Productions<br>
+    In association with Mystic Feline Films<br><br>
+
+    In the forgotten corners of twilight Paris, where candlelight trembles on rain-slick streets,<br>
+    a secret laboratory once held the impossible — cats forged from science and starlight.<br>
+    Under the cold gaze of Dr. Viktor Grave, they lived as experiments, not souls.<br><br>
+
+    Then came Yeshua — quiet, steadfast, and brave — whose compassion broke their chains.<br>
+    Through storm and shadow, he led them to freedom, to a refuge of warmth and wonder.<br>
+    There, amidst coffee steam and moonlit glass, he opened the Chimera Cats Café —<br>
+    a sanctuary for dreamers, where magic purrs softly between every heartbeat.<br><br>
+
+    But legends do not rest easily. The scientists still whisper in the dark,<br>
+    seeking the power they once commanded. And so the Café endures,<br>
+    half myth, half miracle — a beacon for all who have ever been caged.<br><br>
+
+    Dedicated to the dreamers, the wanderers, and every soul who finds beauty in the impossible.<br>
+    May your spirit remain untamed.<br><br>
+  </div>
+</div>
+
+<style>
+  #credits-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: radial-gradient(circle at center, #0e0e1a 0%, #05050a 100%);
+    color: #e5d8ff;
+    font-family: "Cinzel", serif;
+    text-align: center;
+    overflow: hidden;
+    padding-top: 50px;
+  }
+
+  #pause-button, #resume-button {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #9f9fff;
+    color: #cfcfff;
+    font-family: "Cinzel", serif;
+    padding: 8px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 6px;
+    backdrop-filter: blur(6px);
+  }
+
+  #credits-content {
+    position: absolute;
+    bottom: -100%;
+    width: 100%;
+    font-size: 18px;
+    line-height: 1.8;
+    animation: scrollCredits 120s linear infinite;
+  }
+
+  @keyframes scrollCredits {
+    0% { bottom: -100%; }
+    100% { bottom: 100%; }
+  }
+
+  @media (max-width: 768px) {
+    #credits-content { font-size: 14px; }
+  }
+</style>
+
+<script>
+  const credits = document.getElementById('credits-content');
+  let isPaused = false;
+
+  function pauseCredits() {
+    if (!isPaused) {
+      credits.style.animationPlayState = 'paused';
+      isPaused = true;
+    }
+  }
+
+  function resumeCredits() {
+    if (isPaused) {
+      credits.style.animationPlayState = 'running';
+      isPaused = false;
+    }
+  }
+</script>
+
+        const audio = document.getElementById('background-music');
+        const chatbotModal = document.getElementById('chatbot-modal');
+        const speedSlider = document.getElementById('speed-slider');
+        const creditsContent = document.getElementById('credits-content');
+        const creditsContainer = document.getElementById('credits-container');
+        const pauseButton = document.getElementById('pause-button');
+        const resumeButton = document.getElementById('resume-button');
+        const mainMenu = document.getElementById('main-menu');
+
+        audio.addEventListener('error', () => {
+            alert('Oops! The soundtrack failed to load. Enjoy the credits in silence or check your connection.');
+        });
+
+        function showChatbot() {
+            chatbotModal.style.display = 'block';
         }
 
-        let drawerState = 0;  // 0: Hidden, 1: Nav, 2: Player
-        const spider = document.getElementById('spider');
-        const drawer = document.getElementById('drawer');
-        const navMenu = document.getElementById('nav-menu');
-        const musicPlayer = document.getElementById('music-player');
-        const audio = document.getElementById('audio');
-        const playPauseBtn = document.getElementById('play-pause');
-        const nextBtn = document.getElementById('next');
-        const tracks = document.querySelectorAll('.track');
-        let currentTrackIndex = 0;
-
-        function toggleDrawer() {
-            spider.classList.add('shake');  // Shake on click
-            setTimeout(() => spider.classList.remove('shake'), 500);  // Remove after shake
-            drawerState++;
-            if (drawerState === 1) {
-                // Show navigation
-                drawer.classList.add('active');
-                navMenu.classList.remove('hidden');
-                musicPlayer.classList.add('hidden');
-            } else if (drawerState === 2) {
-                // Show music player
-                navMenu.classList.add('hidden');
-                musicPlayer.classList.remove('hidden');
+        function startChat() {
+            const name = document.getElementById('user-name').value || 'adventurer';
+            if (confirm(`Great! Hello, ${name}! You're about to watch the beginning of a legendary movie. Shall we proceed?`)) {
+                const speed = speedSlider.value + 's';
+                creditsContent.style.animation = `scrollCredits ${speed} linear forwards`;
+                audio.play().catch(error => console.error('Audio play failed:', error));
+                chatbotModal.style.display = 'none';
+                showCredits();
             } else {
-                // Hide everything
-                drawer.classList.remove('active');
-                drawerState = 0;
+                alert(`🕷️ No worries, ${name}! Take your time exploring the site. Check out the music or spiderweb for more fun.`);
+                chatbotModal.style.display = 'none';
             }
         }
 
-        // Music Player Functionality
-        tracks.forEach((track, index) => {
-            track.addEventListener('click', () => {
-                currentTrackIndex = index;
-                audio.src = track.dataset.src;
-                audio.play();
-                tracks.forEach(t => t.classList.remove('active'));
-                track.classList.add('active');
-                playPauseBtn.textContent = 'Pause';
-            });
-        });
+        function showCredits() {
+            document.getElementById('initial-screen').style.display = 'none';
+            creditsContainer.style.display = 'block';
+            pauseButton.style.display = 'block';
+            resumeButton.style.display = 'none';
+        }
 
-        playPauseBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
-                playPauseBtn.textContent = 'Pause';
-            } else {
-                audio.pause();
-                playPauseBtn.textContent = 'Play';
-            }
-        });
+        function pauseCredits() {
+            creditsContent.style.animationPlayState = 'paused';
+            pauseButton.style.display = 'none';
+            resumeButton.style.display = 'block';
+        }
 
-        nextBtn.addEventListener('click', () => {
-            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
-            const nextTrack = tracks[currentTrackIndex];
-            audio.src = nextTrack.dataset.src;
+        function resumeCredits() {
+            creditsContent.style.animationPlayState = 'running';
+            resumeButton.style.display = 'none';
+            pauseButton.style.display = 'block';
+        }
+
+        function playMusic() {
             audio.play();
-            tracks.forEach(t => t.classList.remove('active'));
-            nextTrack.classList.add('active');
-            playPauseBtn.textContent = 'Pause';
-        });
+            highlightActiveTrack();
+        }
 
-        audio.addEventListener('ended', () => {
-            nextBtn.click();  // Auto-play next
-        });
+        function pauseMusic() {
+            audio.pause();
+        }
 
-        // Navigation Link Clicks with Web Animation
-        const navLinks = document.querySelectorAll('#nav-menu a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();  // Prevent default anchor behavior
-                const targetId = e.target.dataset.target;
-                const targetElement = document.getElementById(targetId);
+        function volumeUp() {
+            audio.volume = Math.min(1, audio.volume + 0.1);
+        }
 
-                // Create web line from spider to link
-                const webLine = document.createElement('div');
-                webLine.className = 'web-line';
-                webLine.style.top = spider.offsetTop + 'px';  // Start from spider
-                webLine.style.left = spider.offsetLeft + 'px';
-                webLine.style.height = (targetElement.offsetTop - spider.offsetTop) + 'px';  // To target
-                document.body.appendChild(webLine);
+        function playTrack(trackId) {
+            const tracks = [
+                'https://example.com/cinematic-soundtrack.mp3',  // Track 1
+                'https://example.com/escape-from-the-lab.mp3',   // Track 2
+                'https://example.com/sanctuary-serenade.mp3',    // Track 3
+                'audio/charigreetings.mp3'                       // Track 4
+            ];
+            if (trackId >= 1 && trackId <= tracks.length) {
+                audio.src = tracks[trackId - 1];
+                audio.play().catch(error => console.error('Audio play failed:', error));
+                highlightActiveTrack(trackId);
+            }
+        }
 
-                setTimeout(() => {
-                    webLine.style.opacity = 1;  // Animate web
-                    setTimeout(() => {
-                        webLine.style.opacity = 0;  // Recede web
-                        setTimeout(() => webLine.remove(), 500);
-                        // Activate link (scroll to section)
-                        targetElement.classList.add('active');
-                        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
-                    }, 500);  // Web duration
-                }, 100);
-            });
-        });
+        function highlightActiveTrack(trackId = 1) {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            items[trackId - 1].classList.add('active');
+        }
+
+        function toggleMusicDrawer() {
+            const drawer = document.getElementById('music-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function toggleMainMenu() {
+            if (mainMenu.style.display === 'block') {
+                mainMenu.style.display = 'none';
+            } else {
+                mainMenu.style.display = 'block';
+            }
+        }
     </script>
 </body>
 </html>
