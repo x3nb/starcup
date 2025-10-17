@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures responsiveness -->
+    <title>Chimera Cats Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Updated for responsiveness */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+
+        #initial-screen, #chatbot-modal, #music-drawer {
+            max-width: 100vw; /* Responsive cap */
+        }
+
+        /* ... (All other styles unchanged) ... */
+    </style>
+</head>
+<body>
+    <!-- ... (HTML structure unchanged) ... -->
+
+    <script>
+        const audio = document.getElementById('background-music');
+        const chatbotModal = document.getElementById('chatbot-modal');
+
+        audio.addEventListener('error', () => {
+            alert('Oops! The soundtrack failed to load. Enjoy the credits in silence or check your connection.');
+        });
+
+        function showChatbot() {
+            chatbotModal.style.display = 'block';
+        }
+
+        function startChat() {
+            const name = document.getElementById('user-name').value || 'adventurer';
+            if (confirm(`Great! Hello, ${name}! You're about to watch the beginning of a legendary movie. Shall we proceed?`)) {
+                audio.play().catch(error => console.error('Audio play failed:', error));  // Handle play errors
+                chatbotModal.style.display = 'none';
+                showCredits();
+            } else {
+                alert(`🕷️ No worries, ${name}! Take your time exploring the site. Check out the music or spiderweb for more fun.`);
+                chatbotModal.style.display = 'none';
+            }
+        }
+
+        // ... (All other functions unchanged) ...
+    </script>
+</body>
+</html>
