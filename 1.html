@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Director's Cut: Spiderweb Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* Background with Tiny Bubbles */
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none; /* Bubbles don't interfere with clicks */
+        }
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, cornflowerblue 0%, indigo 70%);
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-100vh) scale(1.5); opacity: 0.2; }
+            100% { transform: translateY(-200vh) scale(2); opacity: 0; }
+        }
+
+        /* Generate bubbles dynamically via JS */
+        /* (We'll add this in JavaScript) */
+
+        /* Font Gradient (Cornflower Blue to Indigo) */
+        h1, h2, a {
+            background: linear-gradient(45deg, cornflowerblue, indigo);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Spider Styles */
+        #spider {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 48px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        #spider.shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* Drawer Styles */
+        #drawer {
+            position: fixed;
+            top: -200px; /* Hidden initially */
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            transition: top 0.5s ease-in-out;
+            z-index: 1000;
+        }
+        #drawer.active {
+            top: 0; /* Drops down */
+        }
+        .menu-content, .player-content {
+            padding: 20px;
+            text-align: center;
+        }
+        #nav-menu ul {
+            list-style: none;
+            padding: 0;
+        }
+        #nav-menu li {
+            margin: 10px 0;
+        }
+        #nav-menu a {
+            text-decoration: none;
+            font-size: 24px;
+            display: block;
+            transition: color 0.3s;
+        }
+        #nav-menu a:hover {
+            text-shadow: 0 0 10px cornflowerblue;
+        }
+
+        /* Web Animation (for spider spinning web) */
+        .web-line {
+            position: absolute;
+            width: 2px;
+            height: 0; /* Starts hidden */
+            background: radial-gradient(circle, cornflowerblue 0%, indigo 100%);
+            transition: height 0.5s, opacity 0.5s;
+            z-index: 999;
+        }
+
+        /* Music Player Styles */
+        #music-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #playlist {
+            max-height: 150px;
+            overflow-y: auto;
+            width: 80%;
+            margin: 10px 0;
+        }
+        .track {
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .track.active {
+            background: linear-gradient(45deg, cornflowerblue, indigo);
+            color: black;
+            border-radius: 5px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, cornflowerblue, indigo);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Content Sections */
+        main {
+            padding: 50px;
+            margin-top: 100px; /* Space for drawer */
+        }
+        section {
+            margin: 50px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        section.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div> <!-- Bubble container -->
+    <div id="spider" onclick="toggleDrawer()">🕷️</div>
+    <div id="drawer" class="hidden">
+        <div id="nav-menu" class="menu-content">
+            <ul>
+                <li><a href="#about" data-target="about">About</a></li>
+                <li><a href="#lore" data-target="lore">Lore</a></li>
+                <li><a href="#movie-time" data-target="movie-time">Movie Time</a></li>
+                <li><a href="#characters" data-target="characters">Characters</a></li>
+                <li><a href="#cafe" data-target="cafe">Cafe</a></li>
+                <li><a href="#join" data-target="join">Join For Full Access</a></li>
+            </ul>
+        </div>
+        <div id="music-player" class="player-content hidden">
+            <div id="playlist">
+                <div class="track" data-src="assets/audio/track1.mp3">Track 1</div>
+                <div class="track" data-src="assets/audio/track2.mp3">Track 2</div>
+                <div class="track" data-src="assets/audio/track3.mp3">Track 3</div>
+                <div class="track" data-src="assets/audio/track4.mp3">Track 4</div>
+            </div>
+            <audio id="audio" src="assets/audio/track1.mp3"></audio>
+            <button id="play-pause">Play</button>
+            <button id="next">Next</button>
+        </div>
+    </div>
+
+    <main>
+        <h1>Director's Cut: Epic Spiderweb Adventure</h1>
+        <section id="about">This is the About section. Dive into the story behind our cinematic universe.</section>
+        <section id="lore">Explore the Lore: Ancient secrets and thrilling plots await.</section>
+        <section id="movie-time">Movie Time: Watch exclusive clips and trailers here.</section>
+        <section id="characters">Meet the Characters: Heroes, villains, and everything in between.</section>
+        <section id="cafe">Visit the Cafe: Relax with themed merchandise and exclusives.</section>
+        <section id="join">
+            <h2>Join For Full Access</h2>
+            <p>Sign up now for premium content! <button onclick="alert('Sign-up successful!')">Sign Up</button></p>
+        </section>
+    </main>
+
+    <script>
+        // Generate bubbles for background
+        const background = document.getElementById('background');
+        for (let i = 0; i < 50; i++) {  // 50 bubbles
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.style.width = Math.random() * 20 + 10 + 'px';  // 10-30px
+            bubble.style.height = bubble.style.width;
+            bubble.style.left = Math.random() * 100 + '%';
+            bubble.style.animationDuration = Math.random() * 5 + 5 + 's';  // 5-10s
+            bubble.style.animationDelay = Math.random() * 5 + 's';
+            background.appendChild(bubble);
+        }
+
+        let drawerState = 0;  // 0: Hidden, 1: Nav, 2: Player
+        const spider = document.getElementById('spider');
+        const drawer = document.getElementById('drawer');
+        const navMenu = document.getElementById('nav-menu');
+        const musicPlayer = document.getElementById('music-player');
+        const audio = document.getElementById('audio');
+        const playPauseBtn = document.getElementById('play-pause');
+        const nextBtn = document.getElementById('next');
+        const tracks = document.querySelectorAll('.track');
+        let currentTrackIndex = 0;
+
+        function toggleDrawer() {
+            spider.classList.add('shake');  // Shake on click
+            setTimeout(() => spider.classList.remove('shake'), 500);  // Remove after shake
+            drawerState++;
+            if (drawerState === 1) {
+                // Show navigation
+                drawer.classList.add('active');
+                navMenu.classList.remove('hidden');
+                musicPlayer.classList.add('hidden');
+            } else if (drawerState === 2) {
+                // Show music player
+                navMenu.classList.add('hidden');
+                musicPlayer.classList.remove('hidden');
+            } else {
+                // Hide everything
+                drawer.classList.remove('active');
+                drawerState = 0;
+            }
+        }
+
+        // Music Player Functionality
+        tracks.forEach((track, index) => {
+            track.addEventListener('click', () => {
+                currentTrackIndex = index;
+                audio.src = track.dataset.src;
+                audio.play();
+                tracks.forEach(t => t.classList.remove('active'));
+                track.classList.add('active');
+                playPauseBtn.textContent = 'Pause';
+            });
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = 'Pause';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = 'Play';
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+            const nextTrack = tracks[currentTrackIndex];
+            audio.src = nextTrack.dataset.src;
+            audio.play();
+            tracks.forEach(t => t.classList.remove('active'));
+            nextTrack.classList.add('active');
+            playPauseBtn.textContent = 'Pause';
+        });
+
+        audio.addEventListener('ended', () => {
+            nextBtn.click();  // Auto-play next
+        });
+
+        // Navigation Link Clicks with Web Animation
+        const navLinks = document.querySelectorAll('#nav-menu a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();  // Prevent default anchor behavior
+                const targetId = e.target.dataset.target;
+                const targetElement = document.getElementById(targetId);
+
+                // Create web line from spider to link
+                const webLine = document.createElement('div');
+                webLine.className = 'web-line';
+                webLine.style.top = spider.offsetTop + 'px';  // Start from spider
+                webLine.style.left = spider.offsetLeft + 'px';
+                webLine.style.height = (targetElement.offsetTop - spider.offsetTop) + 'px';  // To target
+                document.body.appendChild(webLine);
+
+                setTimeout(() => {
+                    webLine.style.opacity = 1;  // Animate web
+                    setTimeout(() => {
+                        webLine.style.opacity = 0;  // Recede web
+                        setTimeout(() => webLine.remove(), 500);
+                        // Activate link (scroll to section)
+                        targetElement.classList.add('active');
+                        document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+                    }, 500);  // Web duration
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
