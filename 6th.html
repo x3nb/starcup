@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chimera Cats Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles (unchanged) */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            color: white;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Initial Screen Styles (unchanged) */
+        #initial-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        #title-text {
+            font-size: 72px;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(to right, cornflowerblue, indigo, deeppurple);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        #title-text::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, cornflowerblue 0%, indigo 50%, deeppurple 100%);
+            opacity: 0.3;
+            filter: blur(10px);
+            animation: wisps 5s infinite alternate;
+        }
+
+        @keyframes wisps {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.2; }
+            100% { transform: scale(1.1) rotate(5deg); opacity: 0.5; }
+        }
+
+        #cafe-image {
+            width: 250px;
+            height: 250px;
+            background-color: gray;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Spiderweb Emoji Styles (unchanged) */
+        #spiderweb-emoji {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            font-size: 48px;
+            cursor: pointer;
+            animation: glow 2s infinite alternate;
+            z-index: 1000;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px cornflowerblue, 0 0 10px indigo; }
+            100% { text-shadow: 0 0 10px deeppurple, 0 0 20px cornflowerblue; }
+        }
+
+        /* Music Drawer Styles (unchanged) */
+        #music-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100vh;
+            background: linear-gradient(to bottom, deeppurple, black);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px indigo;
+            transition: right 0.5s ease;
+            overflow-y: auto;
+            z-index: 2000;
+        }
+
+        #music-drawer.open {
+            right: 0;
+        }
+
+        .playlist-item {
+            margin: 10px 0;
+            cursor: pointer;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .playlist-item.active {
+            color: cornflowerblue;
+            text-shadow: 0 0 10px cornflowerblue;
+        }
+
+        #close-drawer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Chatbot Modal Styles */
+        #chatbot-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px deeppurple;
+            z-index: 3000;
+            display: none;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        #chatbot-modal span {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #chatbot-modal input, #chatbot-modal button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+        }
+
+        /* Credits Screen Styles (unchanged) */
+        #credits-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            display: none;
+            overflow: hidden;
+        }
+
+        #credits-content {
+            /* ... (as before) ... */
+        }
+    </style>
+</head>
+<body>
+    <div id="initial-screen">
+        <div id="title-text">CHIMERA CATS CAFE</div>
+        <div id="cafe-image" onclick="showChatbot()"> <!-- Updated to show chatbot first -->
+            </div>
+    </div>
+
+    <div id="credits-container">
+        <div id="credits-content">
+            <!-- Credits content as before -->
+            CHIMERA CATS CAFE<br>
+            A Legendary Tale<br><br>
+            <!-- ... (full credits text) ... -->
+        </div>
+    </div>
+
+    <div id="spiderweb-emoji" onclick="toggleMusicDrawer()">🕸️</div>
+
+    <div id="music-drawer">
+        <button id="close-drawer" onclick="toggleMusicDrawer()">×</button>
+        <h2>Music Soundtrack</h2>
+        <audio id="background-music" loop>
+            <source src="https://example.com/cinematic-soundtrack.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        
+        <div id="audio-controls">
+            <button onclick="playMusic()">Play</button>
+            <button onclick="pauseMusic()">Pause</button>
+            <button onclick="volumeUp()">Louder</button>
+        </div>
+        
+        <div id="playlist">
+            <div class="playlist-item" onclick="playTrack(1)">Whispers of the Chimera</div>
+            <div class="playlist-item" onclick="playTrack(2)">Escape from the Lab</div>
+            <div class="playlist-item" onclick="playTrack(3)">Sanctuary Serenade</div>
+        </div>
+    </div>
+
+    <div id="chatbot-modal">
+        <span>🕷️ Hello! I'm the Spider Guide. What would you like to be called?</span>
+        <input type="text" id="user-name" placeholder="Enter your name">
+        <button onclick="startChat()">Submit</button>
+    </div>
+
+    <script>
+        const audio = document.getElementById('background-music');
+        const chatbotModal = document.getElementById('chatbot-modal');
+
+        function showChatbot() {
+            chatbotModal.style.display = 'block';  // Show the modal
+        }
+
+        function startChat() {
+            const name = document.getElementById('user-name').value || 'adventurer';
+            if (confirm(`Great! Hello, ${name}! You're about to watch the beginning of a legendary movie. Shall we proceed?`)) {
+                // Yes: Show credits
+                chatbotModal.style.display = 'none';  // Hide modal
+                showCredits();  // Proceed to credits
+            } else {
+                // No: Handle response
+                alert(`🕷️ No worries, ${name}! Take your time exploring the site. Check out the music or spiderweb for more fun.`);
+                chatbotModal.style.display = 'none';  // Hide modal
+                // Optionally, highlight other elements, e.g., document.getElementById('spiderweb-emoji').style.opacity = 1;
+            }
+        }
+
+        function playMusic() {
+            audio.play();
+            highlightActiveTrack();
+        }
+
+        function pauseMusic() {
+            audio.pause();
+        }
+
+        function volumeUp() {
+            audio.volume = Math.min(1, audio.volume + 0.1);
+        }
+
+        function playTrack(trackId) {
+            audio.play();
+            highlightActiveTrack(trackId);
+        }
+
+        function highlightActiveTrack(trackId = 1) {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            items[trackId - 1].classList.add('active');
+        }
+
+        function toggleMusicDrawer() {
+            const drawer = document.getElementById('music-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function showCredits() {
+            document.getElementById('initial-screen').style.display = 'none';
+            const creditsContainer = document.getElementById('credits-container');
+            creditsContainer.style.display = 'block';
+            const creditsContent = document.getElementById('credits-content');
+            creditsContent.style.animation = 'scrollCredits 60s linear forwards';
+            setTimeout(() => {
+                creditsContainer.style.display = 'none';
+                document.getElementById('initial-screen').style.display = 'flex';
+            }, 60000);
+        }
+    </script>
+</body>
+</html>
