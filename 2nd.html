@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chimera Cats Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black; /* Black background for the entire site */
+            color: white; /* Default text color, though we'll override for credits */
+            overflow: hidden; /* Prevent default scrolling */
+            font-family: 'Cinzel', serif; /* Gothic font for initial screen */
+        }
+
+        /* Initial Screen Styles */
+        #initial-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Full viewport height */
+            text-align: center;
+        }
+
+        #title-text {
+            font-size: 72px;
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(to right, cornflowerblue, indigo, deeppurple); /* Gradient for wisps */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; /* Makes the text show the gradient */
+            position: relative; /* For wisps animation */
+        }
+
+        #title-text::after {
+            content: ''; /* Pseudo-element for wisps */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, cornflowerblue 0%, indigo 50%, deeppurple 100%);
+            opacity: 0.3;
+            filter: blur(10px); /* Wispy effect */
+            animation: wisps 5s infinite alternate; /* Animate the wisps */
+        }
+
+        @keyframes wisps {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.2; }
+            100% { transform: scale(1.1) rotate(5deg); opacity: 0.5; }
+        }
+
+        #cafe-image {
+            width: 250px;
+            height: 250px;
+            background-color: gray; /* Placeholder for image */
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* Credits Screen Styles */
+        #credits-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            display: none; /* Hidden initially */
+            overflow: hidden; /* No scrolling bar */
+        }
+
+        #credits-content {
+            position: absolute;
+            bottom: 0; /* Start from the bottom */
+            width: 100%;
+            font-family: 'Lora', serif;
+            font-size: 24px;
+            line-height: 1.5;
+            text-align: center;
+            color: transparent; /* For gradient effect */
+            background: linear-gradient(to right, lavender, cornflowerblue); /* Gradient colors */
+            -webkit-background-clip: text;
+            background-clip: text; /* Fallback */
+            white-space: pre-wrap; /* Preserve formatting */
+            transform: translateY(100%); /* Start off-screen below */
+            animation: none; /* Will be added via JS */
+        }
+
+        /* Keyframes for Scrolling Animation */
+        @keyframes scrollCredits {
+            0% { transform: translateY(100%); } /* Start from bottom */
+            100% { transform: translateY(-100%); } /* Scroll to top */
+        }
+    </style>
+</head>
+<body>
+    <div id="initial-screen">
+        <div id="title-text">CHIMERA CATS CAFE</div>
+        <div id="cafe-image" onclick="showCredits()"></div> <!-- Image placeholder -->
+    </div>
+
+    <div id="credits-container">
+        <div id="credits-content">
+            CHIMERA CATS CAFE<br>
+            A Legendary Tale<br><br>
+
+            Directed by<br>
+            ÉLODIE LUMIÈRE<br><br>
+
+            Written by<br>
+            AURELIEN NOIR<br><br>
+
+            Starring<br>
+            YESHUA, the Guardian of Shadows .......... Played by MARCEL GAUDIN<br>
+            LUNA, the Dream-Weaver Cat ............... Voiced by ISABELLE RENAUD<br>
+            SHADOW, the Phantom Prowler Cat .......... Voiced by PIERRE LEBLANC<br>
+            MYST, the Illusionist Cat ................ Voiced by SOPHIE DUPONT<br>
+            DR. VIKTOR GRAVE, the Obsessed Scientist . Played by ALEXANDRE MOREAU<br>
+            Café Patrons and Allies .................. Ensemble Cast: Parisian Locals<br><br>
+
+            Music Composed by<br>
+            CLAUDIA VIOLETTE<br>
+            Featuring the haunting melody "Whispers of the Chimera"<br>
+            Performed by the Paris Nocturne Orchestra<br>
+            With original tracks: "Escape from the Lab" and "Sanctuary Serenade"<br><br>
+
+            Produced by<br>
+            Atelier des Rêves Productions<br>
+            In association with Mystic Feline Films<br><br>
+
+            [Pause for a beat, then narrative summary begins]<br><br>
+
+            In the shadows of a forgotten Paris, where science dances with the arcane,<br>
+            the Chimera cats were born—feline marvels with eyes like stars and fur that shimmers like twilight.<br>
+            Captured in the iron grip of mad scientists, led by the relentless Dr. Viktor Grave,<br>
+            these creatures dreamed of freedom, their whispers echoing through cold laboratory halls.<br><br>
+
+            Enter Yeshua, a man of quiet strength and boundless heart, whose compassion ignited a rebellion.<br>
+            With stealth and courage, he shattered their chains, leading the cats to safety through rain-slicked streets.<br>
+            In a hidden corner of the city, Yeshua opened Chimera Cats Cafe—a haven where lattes mingle with magic,<br>
+            and the cats roam free, their purrs weaving tales of resilience and renewal.<br><br>
+
+            Yet, as the scientists plot their return, the cafe becomes a legend:<br>
+            A beacon for the lost, a reminder that even in darkness, light prevails.<br><br>
+
+            Dedicated to the dreamers and defenders of the world,<br>
+            May this story honor the wild spirit within us all.<br><br>
+
+            [Fade to black, with a final wisp animation]
+        </div>
+    </div>
+
+    <script>
+        function showCredits() {
+            // Hide initial screen
+            document.getElementById('initial-screen').style.display = 'none';
+            
+            // Show credits container
+            const creditsContainer = document.getElementById('credits-container');
+            creditsContainer.style.display = 'block';
+            
+            // Start scrolling animation
+            const creditsContent = document.getElementById('credits-content');
+            creditsContent.style.animation = 'scrollCredits 60s linear forwards';  // 60 seconds duration, adjust as needed
+            
+            // Optional: After animation ends, fade out or redirect
+            setTimeout(() => {
+                creditsContainer.style.display = 'none';  // Hide after scrolling
+                document.getElementById('initial-screen').style.display = 'flex';  // Show initial screen again
+            }, 60000);  // Match the animation duration
+        }
+    </script>
+</body>
+</html>
