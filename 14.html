@@ -428,7 +428,7 @@
             audio.volume = Math.min(1, audio.volume + 0.1);
         }
 
-        function playTrack(trackId) {
+                function playTrack(trackId) {
             const tracks = [
                 'https://example.com/cinematic-soundtrack.mp3',
                 'https://example.com/escape-from-the-lab.mp3',
@@ -437,4 +437,30 @@
             ];
             if (trackId >= 1 && trackId <= tracks.length) {
                 audio.src = tracks[trackId - 1];
-                audio.play().catch(error => console.error
+                audio.play().catch(error => console.error('Audio play failed:', error));
+                highlightActiveTrack(trackId);
+            }
+        }
+
+        function highlightActiveTrack(trackId = 1) {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            items[trackId - 1].classList.add('active');
+        }
+
+        function toggleMusicDrawer() {
+            const drawer = document.getElementById('music-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function toggleMainMenu() {
+            if (mainMenu.style.display === 'block') {
+                mainMenu.style.display = 'none';
+            } else {
+                mainMenu.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
+
