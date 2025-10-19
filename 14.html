@@ -216,33 +216,42 @@
             display: none;
             z-index: 5000;
             text-align: center;
+            animation: fadeIn 2s ease-in-out;
         }
 
         #story-button {
             font-size: 36px;
             padding: 20px 40px;
-            background: linear-gradient(to right, deeppurple, indigo);
-            border: none;
+            background: linear-gradient(45deg, deeppurple, indigo, cornflowerblue);
+            border: 3px solid transparent;
+            border-radius: 15px;
             color: white;
-            border-radius: 10px;
             cursor: pointer;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 20px cornflowerblue;
+            animation: epicPulse 2s infinite, borderGlow 3s infinite;
+            box-shadow: 0 0 30px cornflowerblue, inset 0 0 20px rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        #story-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px deeppurple, inset 0 0 30px rgba(255, 255, 255, 0.2);
         }
 
-        #story-section {
-            display: none;
-            padding: 50px;
-            text-align: center;
-            font-family: 'Lora', serif;
-            font-size: 24px;
-            color: white;
+        @keyframes epicPulse {
+            0% { transform: scale(1); background-position: 0% 50%; }
+            50% { transform: scale(1.05); background-position: 100% 50%; }
+            100% { transform: scale(1); background-position: 0% 50%; }
+        }
+
+        @keyframes borderGlow {
+            0% { border-color: cornflowerblue; }
+            50% { border-color: deeppurple; }
+            100% { border-color: indigo; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
         @keyframes scrollCredits {
@@ -254,7 +263,7 @@
 <body>
     <div id="initial-screen">
         <div id="title-text">CHIMERA CATS CAFE</div>
-        <img id="cafe-image" src="images/smileys.png" alt="Chimera Cafe Image" onclick="showChatbot()">
+        <img id="cafe-image" src="path/to/your-image.jpg" alt="Chimera Cafe Image" onclick="showChatbot()">
     </div>
 
     <div id="credits-container">
@@ -297,14 +306,8 @@
         </div>
         <div id="story-transition">
             <p>The tale continues...</p>
-            <button id="story-button" onclick="proceedToStory()">Enter the Legend</button>
+            <button id="story-button" onclick="askToProceed()">Enter the Legend</button>
         </div>
-    </div>
-
-    <div id="story-section">
-        <h1>The Story Begins</h1>
-        <p>This is where your epic story unfolds. Add your narrative here—perhaps the adventures of Yeshua and the Chimera cats in their new sanctuary. Expand this section with chapters, images, or interactive elements!</p>
-        <button onclick="returnToStart()">Return to Start</button>
     </div>
 
     <div id="spiderweb-emoji" onclick="toggleMusicDrawer()">🕸️</div>
@@ -358,7 +361,6 @@
         const resumeButton = document.getElementById('resume-button');
         const mainMenu = document.getElementById('main-menu');
         const storyTransition = document.getElementById('story-transition');
-        const storySection = document.getElementById('story-section');
 
         audio.addEventListener('error', () => {
             alert('Oops! The soundtrack failed to load. Enjoy the credits in silence or check your connection.');
@@ -388,8 +390,8 @@
             pauseButton.style.display = 'block';
             resumeButton.style.display = 'none';
             setTimeout(() => {
-                creditsContent.style.display = 'none';  // Hide credits
-                storyTransition.style.display = 'block';  // Show transition button
+                creditsContent.style.display = 'none';
+                storyTransition.style.display = 'block';
             }, parseFloat(speedSlider.value) * 1000);
         }
 
@@ -405,14 +407,13 @@
             pauseButton.style.display = 'block';
         }
 
-        function proceedToStory() {
-            creditsContainer.style.display = 'none';
-            storySection.style.display = 'block';
-        }
-
-        function returnToStart() {
-            storySection.style.display = 'none';
-            document.getElementById('initial-screen').style.display = 'flex';
+        function askToProceed() {
+            if (confirm('Would you like to continue to the story?')) {
+                window.location.href = 'https://example.com/story';  // Replace with your story URL
+            } else {
+                creditsContainer.style.display = 'none';
+                document.getElementById('initial-screen').style.display = 'flex';
+            }
         }
 
         function playMusic() {
@@ -428,7 +429,7 @@
             audio.volume = Math.min(1, audio.volume + 0.1);
         }
 
-                        function playTrack(trackId) {
+        function playTrack(trackId) {
             const tracks = [
                 'https://example.com/cinematic-soundtrack.mp3',
                 'https://example.com/escape-from-the-lab.mp3',
@@ -437,29 +438,4 @@
             ];
             if (trackId >= 1 && trackId <= tracks.length) {
                 audio.src = tracks[trackId - 1];
-                audio.play().catch(error => console.error('Audio play failed:', error));
-                highlightActiveTrack(trackId);
-            }
-        }
-
-        function highlightActiveTrack(trackId = 1) {
-            const items = document.querySelectorAll('.playlist-item');
-            items.forEach(item => item.classList.remove('active'));
-            items[trackId - 1].classList.add('active');
-        }
-
-        function toggleMusicDrawer() {
-            const drawer = document.getElementById('music-drawer');
-            drawer.classList.toggle('open');
-        }
-
-        function toggleMainMenu() {
-            if (mainMenu.style.display === 'block') {
-                mainMenu.style.display = 'none';
-            } else {
-                mainMenu.style.display = 'block';
-            }
-        }
-    </script>
-</body>
-</html>
+                audio.play().catch(error => console.error('Audio play
