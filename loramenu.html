@@ -459,8 +459,108 @@
             chatbotModal.style.display = 'block';
         }
 
-        function startChat() {
+               function startChat() {
             const name = document.getElementById('user-name').value || 'adventurer';
             if (confirm(`Great! Hello, ${name}! You're about to watch the beginning of a legendary movie. Shall we proceed?`)) {
                 const speed = speedSlider.value + 's';
-                creditsContent.style
+                creditsContent.style.animation = `scrollCredits ${speed} linear forwards`;
+                audio.play().catch(error => console.error('Audio play failed:', error));
+                chatbotModal.style.display = 'none';
+                announcementsButton.style.display = 'block';  // Show announcements button after chatbot
+                showCredits();
+            } else {
+                alert(`🕷️ No worries, ${name}! Take your time exploring the site. Check out the music or spiderweb for more fun.`);
+                chatbotModal.style.display = 'none';
+                announcementsButton.style.display = 'block';  // Still show announcements
+            }
+        }
+
+        function showCredits() {
+            document.getElementById('initial-screen').style.display = 'none';
+            creditsContainer.style.display = 'block';
+            pauseButton.style.display = 'block';
+            resumeButton.style.display = 'none';
+            setTimeout(() => {
+                creditsContent.style.display = 'none';
+                storyTransition.style.display = 'block';
+            }, parseFloat(speedSlider.value) * 1000);
+        }
+
+        function pauseCredits() {
+            creditsContent.style.animationPlayState = 'paused';
+            pauseButton.style.display = 'none';
+            resumeButton.style.display = 'block';
+        }
+
+        function resumeCredits() {
+            creditsContent.style.animationPlayState = 'running';
+            resumeButton.style.display = 'none';
+            pauseButton.style.display = 'block';
+        }
+
+        function askToProceed() {
+            if (confirm('Would you like to continue to the story?')) {
+                window.location.href = 'https://example.com/story';  // Replace with your story URL
+            } else {
+                creditsContainer.style.display = 'none';
+                document.getElementById('initial-screen').style.display = 'flex';
+            }
+        }
+
+        function showAnnouncementsModal() {
+            announcementsModal.style.display = 'block';
+        }
+
+        function closeAnnouncementsModal() {
+            announcementsModal.style.display = 'none';
+        }
+
+        function playMusic() {
+            audio.play();
+            highlightActiveTrack();
+        }
+
+        function pauseMusic() {
+            audio.pause();
+        }
+
+        function volumeUp() {
+            audio.volume = Math.min(1, audio.volume + 0.1);
+        }
+
+        function playTrack(trackId) {
+            const tracks = [
+                'https://example.com/cinematic-soundtrack.mp3',
+                'https://example.com/escape-from-the-lab.mp3',
+                'https://example.com/sanctuary-serenade.mp3',
+                'audio/charigreetings.mp3'
+            ];
+            if (trackId >= 1 && trackId <= tracks.length) {
+                audio.src = tracks[trackId - 1];
+                audio.play().catch(error => console.error('Audio play failed:', error));
+                highlightActiveTrack(trackId);
+            }
+        }
+
+        function highlightActiveTrack(trackId = 1) {
+            const items = document.querySelectorAll('.playlist-item');
+            items.forEach(item => item.classList.remove('active'));
+            items[trackId - 1].classList.add('active');
+        }
+
+        function toggleMusicDrawer() {
+            const drawer = document.getElementById('music-drawer');
+            drawer.classList.toggle('open');
+        }
+
+        function toggleMainMenu() {
+            if (mainMenu.style.display === 'block') {
+                mainMenu.style.display = 'none';
+            } else {
+                mainMenu.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
+
