@@ -8,89 +8,255 @@
   body {
     margin: 0;
     background-color: black;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     color: #b0c4de;
     overflow: hidden;
   }
 
-  /* Center the coffee cup */
+  /* Centered container for all prompts */
   .centered {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    text-align: center;
     padding: 20px;
+    text-align: center;
   }
 
-  /* Coffee cup emoji styling */
-  #coffee-emoji {
-    font-size: 5em;
-    cursor: pointer; /* visual cue for clickability */
-    transition: transform 0.2s;
+  /* Start button style */
+  #startButton {
+    font-size: 2em;
+    padding: 20px 40px;
+    background-color: #7fb0f5;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
   }
 
-  #coffee-emoji:hover {
-    transform: scale(1.1);
+  #startButton:hover {
+    background-color: #5aa0e0;
   }
 
-  /* Transition overlay */
-  #transition {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3em;
-    color: #b0c4de;
-    opacity: 0;
-    z-index: 10;
-    transition: opacity 2s, filter 2s;
-  }
-
+  /* Hide elements class */
   .hidden {
     display: none;
+  }
+
+  /* Styles for prompts and questions */
+  h1, p {
+    margin: 20px 0;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    background-color: #7fb0f5;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button:hover {
+    background-color: #5aa0e0;
   }
 </style>
 </head>
 <body>
 
-<!-- Only the coffee cup on the initial page -->
-<div id="initialScene" class="centered">
-  <div id="coffee-container">
-    <div id="coffee-emoji">☕️</div>
-  </div>
+<!-- Main container where all prompts will be shown -->
+<div id="mainContainer" class="centered">
+  <button id="startButton">Start Your Journey</button>
 </div>
 
-<!-- Transition overlay -->
-<div id="transition"></div>
-
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const coffeeEmoji = document.getElementById('coffee-emoji');
-    const transitionDiv = document.getElementById('transition');
+  const mainContainer = document.getElementById('mainContainer');
 
-    // Attach click event
-    coffeeEmoji.addEventListener('click', () => {
-      startTransition();
-    });
+  // Function to clear container
+  function clearContainer() {
+    mainContainer.innerHTML = '';
+  }
 
-    function startTransition() {
-      transitionDiv.style.opacity = '1';
-      transitionDiv.style.filter = 'blur(10px)';
-      setTimeout(() => {
-        transitionDiv.style.opacity = '0';
-        transitionDiv.style.filter = 'blur(0)';
-        setTimeout(() => {
-          transitionDiv.style.display = 'none';
-          alert('Transition complete! You can now proceed to the next part of your site.');
-        }, 2000);
-      }, 2000);
+  // Start button event
+  document.getElementById('startButton').addEventListener('click', () => {
+    showNamePrompt();
+  });
+
+  // Show name prompt
+function showNamePrompt() {
+  clearContainer();
+  const html = `
+    <h1>Welcome</h1>
+    <p>What should we call you?</p>
+    <input type="text" id="nameInput" placeholder="Your name" />
+    <button id="confirmName">Confirm</button>
+  `;
+  mainContainer.innerHTML = html;
+
+  document.getElementById('confirmName').addEventListener('click', () => {
+    const name = document.getElementById('nameInput').value.trim();
+    if (name) {
+      userName = name;
+      showNameConfirmation();
+    } else {
+      alert('Please enter a name.');
     }
   });
-</script>
+}
 
+let userName = '';
+
+function showNameConfirmation() {
+  clearContainer();
+  const html = `
+    <p>Is "${userName}" your favorite name?</p>
+    <button id="nameYes">Yes</button>
+    <button id="nameNo">No, I also go by this name</button>
+  `;
+  mainContainer.innerHTML = html;
+
+  document.getElementById('nameYes').addEventListener('click', () => {
+    showAdventurePrompt();
+  });
+  document.getElementById('nameNo').addEventListener('click', () => {
+    showNamePrompt();
+  });
+}
+
+function showAdventurePrompt() {
+  clearContainer();
+  const html = `
+    <p>In this realm you can call yourself any and many names, we don't mind at all, feel free to choose and be yourself or selves, free your mind.</p>
+    <p>Shall we begin our adventure in the new realm?</p>
+    <button id="beginYes">Yes</button>
+    <button id="beginNo">No</button>
+  `;
+  mainContainer.innerHTML = html;
+
+  document.getElementById('beginYes').addEventListener('click', () => {
+    startQuiz();
+  });
+  document.getElementById('beginNo').addEventListener('click', () => {
+    // Restart at the initial prompt
+    showNamePrompt();
+  });
+}
+
+const questions = [
+  {
+    question: "What is the meaning of life?",
+    options: ["To find happiness", "To serve others", "To understand oneself", "It's a mystery"],
+    answer: 3
+  },
+  {
+    question: "If a tree falls in a forest and no one is around to hear it, does it make a sound?",
+    options: ["Yes", "No", "Maybe", "It's complicated"],
+    answer: 0
+  },
+  {
+    question: "Can consciousness exist without perception?",
+    options: ["Yes", "No", "Perhaps", "Never"],
+    answer: 1
+  }
+];
+
+let currentQIndex = 0;
+let correctCount = 0;
+
+function startQuiz() {
+  clearContainer();
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[currentQIndex];
+  const html = `
+    <h2>${q.question}</h2>
+    <div id="answers">
+      ${q.options.map((opt, i) => `
+        <label><input type="radio" name="answer" value="${i}"> ${opt}</label><br>
+      `).join('')}
+    </div>
+    <button id="submitAnswer">Submit</button>
+  `;
+  mainContainer.innerHTML = html;
+
+  document.getElementById('submitAnswer').addEventListener('click', () => {
+    const selected = document.querySelector('input[name="answer"]:checked');
+    if (selected) {
+      const ansIdx = parseInt(selected.value);
+      if (ansIdx === q.answer) {
+        correctCount++;
+      }
+      currentQIndex++;
+      if (currentQIndex < questions.length) {
+        showQuestion();
+      } else {
+        showCertificate();
+      }
+    } else {
+      alert('Please select an answer.');
+    }
+  });
+}
+
+function showCertificate() {
+  clearContainer();
+  const html = `
+    <h2>Congratulations!</h2>
+    <p>You are now a member of the Chimera RPG Quest Club.</p>
+    <button id="downloadCert">Download Your Certificate</button>
+  `;
+  mainContainer.innerHTML = html;
+  document.getElementById('downloadCert').addEventListener('click', () => {
+    downloadCertificate();
+  });
+}
+
+function downloadCertificate() {
+  const certHTML = `
+    <html>
+      <head>
+        <title>Certificate</title>
+      </head>
+      <body style="background-color: black; color: #b0c4de; font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+        <h1 style="font-size: 2em;">🌟 Chimera RPG Quest Club 🌟</h1>
+        <p>This certifies that <strong>${userName}</strong> is a member of the</p>
+        <h2>Chimera RPG Quest Club</h2>
+        <p style="margin-top: 20px;">🎖️</p>
+        <p style="margin-top: 20px;">Enjoy your adventures!</p>
+        <img src="https://i.imgur.com/TEb5pvz.png" alt="Tea Stamp" width="100"/>
+      </body>
+    </html>
+  `;
+  const blob = new Blob([certHTML], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${userName}_Certificate.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showLore();
+}
+
+function showLore() {
+  clearContainer();
+  mainContainer.innerHTML = `
+    <h2>Learn the Lore</h2>
+    <p><a href="#" target="_blank" style="color:#7fb0f5;">Click here to read the lore of the website</a></p>
+  `;
+}
+
+</script>
 </body>
 </html>
