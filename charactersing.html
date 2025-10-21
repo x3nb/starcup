@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Hans' Awakening — Voices of Light</title>
+<style>
+  :root{
+    --bg:#000;
+    --color-start:#6495ED; /* cornflowerblue */
+    --color-end:#C0C0C0;   /* silver/grey */
+    --lyric-duration:20s;  /* how long each lyric travels across screen */
+    --line-delay:10000ms;  /* ms between lines */
+  }
+
+  html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormorant Garamond",Georgia,serif;color:#cfd8e3;overflow:hidden;}
+
+  /* Header portraits */
+  .header {
+    position:absolute;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    display:flex;
+    gap:18px;
+    align-items:center;
+    padding:6px 12px;
+    pointer-events:auto;
+  }
+  .portrait {
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(100,149,237,0.08);
+    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .25s ease;
+  }
+  .portrait img{width:100%;height:100%;object-fit:cover;display:block;opacity:0.98;}
+  .portrait:hover{transform:translateY(-4px) scale(1.02);}
+  .portrait.glow{
+    box-shadow:0 0 30px rgba(100,149,237,0.45), inset 0 0 12px rgba(100,149,237,0.08);
+    transform:translateY(-6px) scale(1.04);
+    border:1px solid rgba(100,149,237,0.45);
+  }
+  .portrait-label{font-size:12px;color:rgba(200,220,255,0.9);text-align:center;margin-top:6px}
+
+  /* starfield canvas */
+  #starfield{position:fixed;inset:0;z-index:1;display:block;}
+
+  /* controls */
+  .controls {
+    position:fixed;
+    bottom:28px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:8;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background:transparent;
+  }
+  .btn{
+    background:transparent;
+    border:1px solid rgba(100,149,237,0.18);
+    color:var(--color-start);
+    padding:8px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+  }
+  .btn.primary{background:linear-gradient(180deg, rgba(100,149,237,0.06), rgba(192,192,192,0.02)); color:white;}
+  .volume { width:160px; }
+
+  /* lyrics area (left→right scrolling) */
+  .lyrics {
+    position:fixed;
+    bottom:28%;
+    left:0;
+    width:100%;
+    height:72px;
+    z-index:5;
+    pointer-events:none; /* clicks go through to portraits / controls */
+  }
+
+  .lyric-line {
+    position:absolute;
+    right:100%;
+    white-space:nowrap;
+    font-size:22px;
+    font-weight:500;
+    letter-spacing:0.6px;
+    color:transparent;
+    background: linear-gradient(90deg, var(--color-start), var(--color-end));
+    -webkit-background-clip: text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    filter: drop-shadow(0 0 8px rgba(100,149,237,0.45));
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* when visible, the line travels across the screen left-to-right */
+  .lyric-line.visible {
+    animation: lyricTravel var(--lyric-duration) linear forwards, lyricGlow 8s ease-in-out infinite;
+    opacity:1;
+  }
+
+  @keyframes lyricTravel {
+    0% { right:100%; opacity:0; transform:translateY(0) }
+    8% { opacity:1; }
+    92% { opacity:1; }
+    100% { right:-100%; opacity:0; }
+  }
+
+  @keyframes lyricGlow {
+    0%,100% { filter: drop-shadow(0 0 6px rgba(100,149,237,0.35)); }
+    50% { filter: drop-shadow(0 0 14px rgba(135,206,235,0.7)); }
+  }
+
+  /* small responsive adjustments */
+  @media (max-width:720px){
+    .portrait{width:64px;height:64px;}
+    .lyric-line{font-size:18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Starfield -->
+<canvas id="starfield"></canvas>
+
+<!-- Character header (replace placeholder src with your images) -->
+<div class="header" id="header">
+  <div class="portrait" data-character="0" id="por-hans" title="Hans">
+    <img src="PLACEHOLDER_HANS_IMG.jpg" alt="Hans">
+  </div>
+  <div class="portrait" data-character="1" id="por-chari" title="Chari">
+    <img src="PLACEHOLDER_CHARI_IMG.jpg" alt="Chari">
+  </div>
+  <div class="portrait" data-character="2" id="por-star" title="Star">
+    <img src="PLACEHOLDER_STAR_IMG.jpg" alt="Star">
+  </div>
+  <div class="portrait" data-character="3" id="por-miki" title="Miki">
+    <img src="PLACEHOLDER_MIKI_IMG.jpg" alt="Miki">
+  </div>
+</div>
+
+<!-- Lyrics container -->
+<div class="lyrics" id="lyricsContainer">
+  <!-- Lines are created dynamically from JS using per-character lyric arrays -->
+</div>
+
+<!-- Controls -->
+<div class="controls" id="controls">
+  <button class="btn" id="prevBtn" title="Previous">⟵</button>
+  <button class="btn primary" id="playBtn" title="Play">▶ Play</button>
+  <button class="btn" id="pauseBtn" title="Pause" style="display:none">⏸ Pause</button>
+  <button class="btn" id="nextBtn" title="Next">⟶</button>
+  <input id="volume" class="volume" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="volume">
+</div>
+
+<!-- Audio elements for each character (replace placeholder URLs) -->
+<audio id="audio-hans" src="PLACEHOLDER_HANS_AUDIO.mp3" preload="auto"></audio>
+<audio id="audio-chari" src="PLACEHOLDER_CHARI_AUDIO.mp3" preload="auto"></audio>
+<audio id="audio-star" src="PLACEHOLDER_STAR_AUDIO.mp3" preload="auto"></audio>
+<audio id="audio-miki" src="PLACEHOLDER_MIKI_AUDIO.mp3" preload="auto"></audio>
+
+<script>
+/* ----------------------------
+   Configuration / Content
+   Replace the placeholder image/audio URLs with real ones.
+   Lyrics are assigned per-character below.
+   ---------------------------- */
+const characters = [
+  { name: "Hans", img: "PLACEHOLDER_HANS_IMG.jpg", audioId: "audio-hans",
+    lyrics: [
+      "In the forgotten corners of twilight Paris,",
+      "I was nothing but breath and hunger —",
+      "a remnant of a man, a vampire carved from absence."
+    ]
+  },
+  { name: "Chari", img: "PLACEHOLDER_CHARI_IMG.jpg", audioId: "audio-chari",
+    lyrics: [
+      "I heard him yowl — a sound like a falling star,",
+      "It was not pain — it was the beginning of morning."
+    ]
+  },
+  { name: "Star", img: "PLACEHOLDER_STAR_IMG.jpg", audioId: "audio-star",
+    lyrics: [
+      "We rose like feathers through forgiving clouds,",
+      "Landing in warmth, where coffee and jasmine sigh."
+    ]
+  },
+  { name: "Miki", img: "PLACEHOLDER_MIKI_IMG.jpg", audioId: "audio-miki",
+    lyrics: [
+      "I waited in the garden, Yeshua at my side,",
+      "And together we learned how to be home."
+    ]
+  }
+];
+
+/* ----------------------------
+   Starfield (gentle upward stars)
+   ---------------------------- */
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const stars = [];
+const STAR_COUNT = Math.round(Math.max(60, window.innerWidth / 18));
+for(let i=0;i<STAR_COUNT;i++){
+  stars.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    r: Math.random()*1.6 + 0.4,
+    speed: 0.06 + Math.random()*0.3, // slowed for melodic pace
+    alpha: 0.15 + Math.random()*0.7
+  });
+}
+
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for (let s of stars){
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(100,149,237,${s.alpha})`;
+    ctx.fill();
+    // ascend
+    s.y -= s.speed;
+    if (s.y < -4){
+      s.y = canvas.height + 4;
+      s.x = Math.random()*canvas.width;
+      s.r = Math.random()*1.6 + 0.4;
+      s.speed = 0.06 + Math.random()*0.3;
+      s.alpha = 0.15 + Math.random()*0.7;
+    }
+  }
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* ----------------------------
+   Initialization of UI & audio
+   ---------------------------- */
+const header = document.getElementById('header');
+const lyricsContainer = document.getElementById('lyricsContainer');
+const portraits = Array.from(document.querySelectorAll('.portrait'));
+const audioEls = characters.map(c => document.getElementById(c.audioId));
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const volume = document.getElementById('volume');
+
+let audioCtx = null;
+let currentCharacterIndex = 0;
+let playing = false;
+let lyricState = {
+  lineIndex: 0,
+  started: false,
+  lastTime: 0,
+  paused: false
+};
+let lyricRAF = null;
+
+/* Create DOM lyric elements from character lyrics (one per line) */
+const allLyricNodes = []; // structure: [{el, charIndex, textIndex}, ...]
+function buildLyricNodes(){
+  lyricsContainer.innerHTML = '';
+  allLyricNodes.length = 0;
+  for (let ci=0; ci<characters.length; ci++){
+    const lines = characters[ci].lyrics;
+    for (let li=0; li<lines.length; li++){
+      const d = document.createElement('div');
+      d.className = 'lyric-line';
+      d.textContent = lines[li];
+      // store indexes for reference
+      d.dataset.charIndex = ci;
+      d.dataset.lineIndex = li;
+      lyricsContainer.appendChild(d);
+      allLyricNodes.push({el:d, charIndex:ci, lineIndex:li});
+    }
+  }
+}
+buildLyricNodes();
+
+/* Attach portrait click handlers */
+portraits.forEach((p, idx) => {
+  p.addEventListener('click', (e)=>{
+    // play that character immediately
+    playCharacter(idx);
+  });
+});
+
+/* Controls handlers */
+playBtn.addEventListener('click', async ()=>{
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // connect each audio element to ctx to ensure playback context unlocked
+    audioEls.forEach(a => {
+      try { audioCtx.createMediaElementSource(a).connect(audioCtx.destination); } catch(e){/* may throw if already connected */ }
+    });
+  }
+  if (!playing){
+    startSequence();
+  } else if (audioEls[currentCharacterIndex].paused){
+    resumeCurrent();
+  } else {
+    // already playing - ignore
+  }
+});
+pauseBtn.addEventListener('click', ()=>{ pauseAll(); });
+
+prevBtn.addEventListener('click', ()=>{
+  const prev = (currentCharacterIndex - 1 + characters.length) % characters.length;
+  playCharacter(prev);
+});
+nextBtn.addEventListener('click', ()=>{
+  const nxt = (currentCharacterIndex + 1) % characters.length;
+  playCharacter(nxt);
+});
+
+volume.addEventListener('input', ()=>{
+  for (const a of audioEls) a.volume = volume.value;
+});
+
+/* Helper: clear any active lyric animations + timers */
+function clearLyricState(){
+  lyricState.lineIndex = 0;
+  lyricState.started = false;
+  lyricState.lastTime = 0;
+  lyricState.paused = false;
+  if (lyricRAF) { cancelAnimationFrame(lyricRAF); lyricRAF = null; }
+  // remove visible classes
+  allLyricNodes.forEach(n => n.el.classList.remove('visible'));
+}
+
+/* Highlight portrait glow */
+function setPortraitGlow(index){
+  portraits.forEach((p,i)=> {
+    if (i===index) p.classList.add('glow'); else p.classList.remove('glow');
+  });
+}
+
+/* Stop all audio */
+function stopAllAudio(){
+  for (const a of audioEls){
+    try { a.pause(); a.currentTime = 0; } catch(e){}
+  }
+}
+
+/* Play a specific character immediately */
+function playCharacter(idx){
+  stopAllAudio();
+  clearLyricState();
+  currentCharacterIndex = idx;
+  setPortraitGlow(idx);
+  const a = audioEls[idx];
+  // ensure AudioContext resumed if needed
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+  a.volume = volume.value;
+  a.currentTime = 0;
+  a.play().catch(()=>{ /* playback blocked until user gesture */ });
+  playing = true;
+  playBtn.style.display = 'none';
+  pauseBtn.style.display = 'inline-block';
+  // start lyric flow for that character
+  lyricState.started = true;
+  lyricState.lineIndex = 0;
+  lyricState.lastTime = 0;
+  lyricState.paused = false;
+  // begin lyric RAF loop
+  lyricRAF = requestAnimationFrame((ts)=> lyricLoop(ts));
+}
+
+/* Resume current (if paused) */
+function resumeCurrent(){
+  const a = audioEls[currentCharacterIndex];
+  if (a) { a.play().catch(()=>{}); }
+  lyricState.paused = false;
+  lyricRAF = requestAnimationFrame((ts)=> lyricLoop(ts));
+  playBtn.style.display = 'none';
+  pauseBtn.style.display = 'inline-block';
+}
+
+/* Pause everything */
+function pauseAll(){
+  for (const a of audioEls) a.pause();
+  lyricState.paused = true;
+  playing = false;
+  playBtn.style.display = 'inline-block';
+  pauseBtn.style.display = 'none';
+  if (lyricRAF){ cancelAnimationFrame(lyricRAF); lyricRAF = null; }
+  setPortraitGlow(-1);
+}
+
+/* Start the whole sequence from currentCharacterIndex (default 0) */
+function startSequence(){
+  // if first time, ensure audioCtx created and audio elements connected
+  if (!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    audioEls.forEach(a => {
+      try { audioCtx.createMediaElementSource(a).connect(audioCtx.destination);}catch(e){}
+    });
+  }
+  playCharacter(currentCharacterIndex);
+}
+
+/* Lyric scheduling using requestAnimationFrame for reliability
+   Logic: show per-character lines sequentially with lineDelay between them.
+   After finishing a character's lines, wait `interlude` then auto-advance to next character.
+*/
+const lineDelay = 10000; // ms between lines
+const interlude = 2500;  // pause between characters (ms)
+
+function lyricLoop(timestamp){
+  if (lyricState.paused) return;
+  if (!lyricState.lastTime) lyricState.lastTime = timestamp;
+  const elapsed = timestamp - lyricState.lastTime;
+
+  const charIdx = currentCharacterIndex;
+  const char = characters[charIdx];
+  const linesCount = char.lyrics.length;
+
+  // show next line when elapsed >= lineDelay
+  if (lyricState.lineIndex < linesCount && elapsed >= lineDelay){
+    // find the global node that corresponds to this char & lineIndex
+    const node = allLyricNodes.find(n => n.charIndex===charIdx && n.lineIndex===lyricState.lineIndex);
+    if (node && node.el){
+      // show the line element
+      node.el.classList.add('visible');
+      // remove visible after travel duration (match CSS --lyric-duration)
+      setTimeout(()=>{ node.el.classList.remove('visible'); }, 20000); // 20s matches var --lyric-duration
+      // subtle bubble/star pulse when line appears
+      pulseStars(6, 0.15);
+    }
+    lyricState.lineIndex++;
+    lyricState.lastTime = timestamp;
+  }
+
+  // character finished: if last line has been displayed and elapsed >= interlude -> advance
+  if (lyricState.lineIndex >= linesCount){
+    // advance if interlude passed
+    if (elapsed >= interlude + lineDelay){
+      // stop character audio and move to next
+      const a = audioEls[charIdx]; try { a.pause(); a.currentTime = 0; } catch(e){}
+      // advance index
+      const nextIdx = (charIdx + 1) % characters.length;
+      currentCharacterIndex = nextIdx;
+      // small delay before starting next character to breathe
+      setTimeout(()=> {
+        playCharacter(nextIdx);
+      }, 300);
+      return; // let next character's playCharacter start its own loop
+    }
+  }
+
+  // continue loop
+  lyricRAF = requestAnimationFrame((ts)=> lyricLoop(ts));
+}
+
+/* Subtle star/bubble pulse effect around the screen center */
+function pulseStars(count=8, alpha=0.12){
+  // draw some transient brighter dots that fade naturally (simple implementation)
+  for (let i=0;i<count;i++){
+    const x = window.innerWidth * (0.2 + Math.random()*0.6);
+    const y = window.innerHeight * (0.3 + Math.random()*0.3);
+    const r = 1 + Math.random()*3;
+    // draw once; since starfield redraws on RAF, this will be gone next frame unless we persist;
+    // we'll do a quick flash by temporarily adding to stars as a brighter short-lived particle.
+    const transient = { x, y, r, speed: 0.9 + Math.random()*0.6, alpha: alpha + Math.random()*0.15, life: 30 };
+    transientParticles.push(transient);
+  }
+}
+
+/* Transient particles (brighter stars) list */
+const transientParticles = [];
+function drawStarsWithTransients(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for (let s of stars){
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(100,149,237,${s.alpha})`;
+    ctx.fill();
+    s.y -= s.speed;
+    if (s.y < -4){ s.y = canvas.height + 4; s.x = Math.random()*canvas.width; s.r = Math.random()*1.6+0.4; s.speed = 0.06 + Math.random()*0.3; s.alpha = 0.15 + Math.random()*0.7; }
+  }
+
+  // draw transient particles (make them fade quickly)
+  for (let i = transientParticles.length - 1; i >= 0; i--){
+    const p = transientParticles[i];
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * (p.life/30), 0, Math.PI*2);
+    ctx.fillStyle = `rgba(173,216,230,${p.alpha * (p.life/30)})`;
+    ctx.fill();
+    p.y -= p.speed;
+    p.life -= 1;
+    if (p.life <= 0) transientParticles.splice(i,1);
+  }
+
+  requestAnimationFrame(drawStarsWithTransients);
+}
+drawStarsWithTransients();
+
+/* Set initial volumes */
+for (const a of audioEls) a.volume = volume.value;
+
+/* When audio ends naturally, advance to next character */
+audioEls.forEach((a, idx) => {
+  a.addEventListener('ended', ()=>{
+    // ensure portrait glow off for this char
+    portraits[idx].classList.remove('glow');
+    // advance to next character
+    const nextIdx = (idx + 1) % characters.length;
+    playCharacter(nextIdx);
+  });
+});
+
+/* On initial load: set portrait labels (optional) and image src already in DOM,
+   and make header accessible (we used placeholder image src attributes earlier).
+*/
+portraits.forEach((p,i) => {
+  // set title attribute if not set
+  if (!p.title) p.title = characters[i].name;
+});
+
+/* Keyboard shortcuts: space toggles play/pause */
+window.addEventListener('keydown', (e)=>{
+  if (e.code === 'Space'){ e.preventDefault(); if (playing) pauseAll(); else startSequence(); }
+});
+
+/* Try to autoplay after a short timeout - browsers may block until gesture.
+   We still rely on user clicking portraits / play button to guarantee sound.
+*/
+setTimeout(()=>{
+  // No forced autoplay. We can attempt resume audio context if already unlocked.
+  try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch(e){}
+}, 800);
+
+</script>
+</body>
+</html>
