@@ -7,24 +7,22 @@
 <style>
   body {
     margin: 0;
-    height: 100vh;
     background: black;
     overflow: hidden;
+    height: 100vh;
+    font-family: "Cinzel", serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: "Cinzel", serif;
   }
 
-  /* Canvas for bubbles */
-  #visualizer {
+  canvas {
     position: absolute;
-    inset: 0;
-    background: transparent;
+    top: 0;
+    left: 0;
     z-index: 1;
   }
 
-  /* Audio controls */
   .controls {
     position: absolute;
     bottom: 4%;
@@ -56,18 +54,16 @@
     accent-color: cornflowerblue;
   }
 
-  /* Lyrics container */
   .lyrics {
     position: absolute;
-    bottom: 20%;
+    bottom: 25%;
     width: 100%;
     height: 60px;
-    overflow: hidden;
     text-align: center;
+    overflow: hidden;
     z-index: 4;
   }
 
-  /* Individual lyric lines */
   .lyric-line {
     position: absolute;
     right: 100%;
@@ -79,53 +75,36 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    filter: drop-shadow(0 0 8px rgba(100,149,237,0.6))
-            drop-shadow(0 0 20px rgba(128,128,128,0.4));
-    transition: opacity var(--fade-time, 1s) ease;
+    filter: drop-shadow(0 0 10px rgba(100,149,237,0.6));
+    transition: opacity 1s ease;
   }
 
-  /* Animate lyric line left-to-right */
   .lyric-line.visible {
-    animation: scrollLineLTR 9s linear forwards, glowTrail 3s ease-in-out infinite;
+    animation: gentleScrollLTR 16s linear forwards, lyricGlow 6s ease-in-out infinite;
   }
 
-  @keyframes scrollLineLTR {
-    0% {
-      right: 100%;
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    90% {
-      opacity: 1;
-    }
-    100% {
-      right: -100%;
-      opacity: 0;
-    }
+  @keyframes gentleScrollLTR {
+    0% { right: 100%; opacity: 0; }
+    10% { opacity: 1; }
+    50% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { right: -100%; opacity: 0; }
   }
 
-  @keyframes glowTrail {
-    0% {
-      filter: drop-shadow(0 0 8px rgba(100,149,237,0.5))
-              drop-shadow(0 0 20px rgba(128,128,128,0.4));
+  @keyframes lyricGlow {
+    0%,100% {
+      filter: drop-shadow(0 0 8px rgba(100,149,237,0.5));
     }
     50% {
-      filter: drop-shadow(0 0 14px rgba(100,149,237,0.8))
-              drop-shadow(0 0 30px rgba(128,128,128,0.6));
-    }
-    100% {
-      filter: drop-shadow(0 0 8px rgba(100,149,237,0.5))
-              drop-shadow(0 0 20px rgba(128,128,128,0.4));
+      filter: drop-shadow(0 0 15px rgba(135,206,235,0.8));
     }
   }
 </style>
 </head>
 <body>
-<canvas id="visualizer"></canvas>
+<canvas id="starfield"></canvas>
 
-<audio id="audio" src="audio/lorefinal.mp3" preload="auto"></audio>
+<audio id="audio" src="YOUR_AUDIO_URL_HERE.mp3" preload="auto"></audio>
 
 <div class="controls">
   <button id="playBtn">▶</button>
@@ -137,25 +116,52 @@
   <div class="lyric-line">Where candlelight trembles on rain-slick streets...</div>
   <div class="lyric-line">Hans remembers the darkness in his blood...</div>
   <div class="lyric-line">Until Yeshua’s light freed him from the curse...</div>
-  <div class="lyric-line">The lab shattered, the angels lifted them away...</div>
-  <div class="lyric-line">And the Chimera Cats Café was born from starlight.</div>
+  <div class="lyric-line">The lab shattered, and angels lifted them away...</div>
+  <div class="lyric-line">The Chimera Cats Café was born from starlight.</div>
 </div>
 
 <script>
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const stars = [];
+const numStars = 120;
+
+for (let i = 0; i < numStars; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 2,
+    speed: 0.2 + Math.random() * 0.6,
+    opacity: 0.3 + Math.random() * 0.7
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, 2 * Math.PI);
+    ctx.fillStyle = `rgba(100,149,237,${star.opacity})`;
+    ctx.fill();
+
+    star.y -= star.speed;
+    if (star.y < -2) {
+      star.y = canvas.height + 2;
+      star.x = Math.random() * canvas.width;
+    }
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// Audio Controls
 const audio = document.getElementById('audio');
 const playBtn = document.getElementById('playBtn');
 const volumeControl = document.getElementById('volumeControl');
-const canvas = document.getElementById('visualizer');
-const ctx = canvas.getContext('2d');
-const lines = document.querySelectorAll('.lyric-line');
-
-let audioCtx, analyser, source, dataArray;
 let started = false;
-let currentLine = 0;
-let lastTime = 0;
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 
 playBtn.addEventListener('click', () => {
   if (!started) {
@@ -174,54 +180,27 @@ volumeControl.addEventListener('input', () => {
 });
 
 function startAudio() {
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  analyser.fftSize = 256;
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(audioCtx.destination);
   audio.play();
   playBtn.textContent = '⏸';
   started = true;
-  requestAnimationFrame(drawVisualizer);
   requestAnimationFrame(lyricLoop);
 }
 
-function drawVisualizer() {
-  if (!started) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  analyser.getByteFrequencyData(dataArray);
-  const bubbleCount = 30;
-
-  for (let i = 0; i < bubbleCount; i++) {
-    const x = Math.random() * canvas.width;
-    const y = canvas.height - (dataArray[i] * 2);
-    const size = dataArray[i] / 10;
-    const alpha = Math.min(1, dataArray[i] / 128);
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, 2 * Math.PI);
-    ctx.fillStyle = `rgba(100,149,237,${alpha})`;
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = 'cornflowerblue';
-    ctx.fill();
-  }
-
-  requestAnimationFrame(drawVisualizer);
-}
+// Lyrics Animation
+const lines = document.querySelectorAll('.lyric-line');
+let currentLine = 0;
+let lastTime = 0;
 
 function showLine(i) {
   if (!lines[i]) return;
   const line = lines[i];
   line.classList.add('visible');
-
-  // Pulse effect: brighten bubbles slightly when new lyric appears
-  pulseBubbles();
-
   setTimeout(() => {
     line.classList.remove('visible');
-  }, 9000);
+  }, 15000);
 }
 
 function lyricLoop(timestamp) {
@@ -229,27 +208,12 @@ function lyricLoop(timestamp) {
   if (!lastTime) lastTime = timestamp;
   const elapsed = timestamp - lastTime;
 
-  if (currentLine < lines.length && elapsed >= 4200) {
+  if (currentLine < lines.length && elapsed >= 7000) {
     showLine(currentLine++);
     lastTime = timestamp;
   }
 
   requestAnimationFrame(lyricLoop);
-}
-
-/* Simple synchronized pulse for bubble glow */
-function pulseBubbles() {
-  ctx.globalAlpha = 0.9;
-  for (let i = 0; i < 20; i++) {
-    const x = Math.random() * canvas.width;
-    const y = Math.random() * canvas.height;
-    const r = Math.random() * 8 + 2;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, 2 * Math.PI);
-    ctx.fillStyle = 'rgba(173,216,230,0.3)';
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
 }
 </script>
 </body>
