@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hans' Awakening — Chimera Cats Café</title>
+  <style>
+    :root {
+      --bg:#000;
+      --color-start: #6495ED;
+      --color-end: #C0C0C0;
+      --fade-time: 900ms;
+      --line-delay-default: 3200ms;
+      --max-width: 980px;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormorant Garamond",Georgia,serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;color:white;}
+    .page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 20px;box-sizing:border-box;position:relative;}
+    .stage{width:100%;max-width:var(--max-width);text-align:center;position:relative;z-index:2;}
+    .player-wrap{display:flex;justify-content:center;align-items:center;gap:16px;margin-bottom:28px;}
+    .play-dial{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%, rgba(100,149,237,0.12), rgba(192,192,192,0.03));box-shadow:0 6px 25px rgba(100,149,237,0.06), inset 0 -6px 10px rgba(0,0,0,0.6);border:1px solid rgba(100,149,237,0.12);}
+    .play-dial .icon{width:56px;height:56px;display:inline-block;transform: translateX(4px);}
+    .controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:20px;}
+    .btn{background:transparent;border:1px solid rgba(100,149,237,0.18);color:var(--color-start);padding:8px 14px;cursor:pointer;border-radius:8px;font-family:inherit;font-size:16px;transition: transform .15s ease, box-shadow .15s ease;backdrop-filter: blur(4px);}
+    .btn:active{transform:scale(.98);}
+    .btn.primary{background:linear-gradient(180deg, rgba(100,149,237,0.06), rgba(192,192,192,0.02));border:1px solid rgba(100,149,237,0.28);color:white;}
+    .lyrics{margin:0 auto;max-width:820px;padding:20px 14px;box-sizing:border-box;text-align:center;}
+    .lyric-line{font-size:20px;line-height:1.6;margin:10px 0;opacity:0;transform:translateY(14px) scale(.995);transition:opacity var(--fade-time) ease, transform var(--fade-time) ease;background:linear-gradient(90deg,var(--color-start),var(--color-end));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;text-shadow:0 6px 20px rgba(0,0,0,0.6);}
+    .lyric-line.visible{opacity:1;transform:translateY(0) scale(1);}
+    @media(max-width:600px){.lyric-line{font-size:16px;}.play-dial{width:100px;height:100px;}}
+    .continue{margin-top:28px;display:inline-block;color:var(--color-start);border:1px solid rgba(100,149,237,0.12);padding:10px 16px;border-radius:10px;text-decoration:none;transition: transform .12s ease, box-shadow .12s ease;}
+    .continue:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(100,149,237,0.06);}
+    .muted-note{margin-top:10px;font-size:13px;color:rgba(192,192,192,0.14);}
+    /* full overlay for unmute */
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:5;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--color-start);font-size:24px;text-align:center;cursor:pointer;transition:opacity .3s ease;}
+    .overlay.hidden{opacity:0;visibility:hidden;}
+    .volume-control{width:200px;margin-top:16px;}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="stage" role="main">
+      <div class="player-wrap">
+        <div class="play-dial" title="Hans' Awakening — Play">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 3v18l15-9z" stroke="url(#g)"></path>
+            <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6495ED"/><stop offset="1" stop-color="#C0C0C0"/></linearGradient></defs>
+          </svg>
+        </div>
+      </div>
+
+      <div class="controls" aria-label="Audio Controls">
+        <button id="pause-btn" class="btn" aria-pressed="false">Pause</button>
+        <button id="resume-btn" class="btn primary" aria-pressed="false">Resume</button>
+        <input type="range" min="0" max="1" step="0.01" value="1" id="volumeSlider" class="volume-control" aria-label="Volume"/>
+      </div>
+
+      <div class="lyrics" id="lyricsContainer">
+        <div class="lyric-line">In the forgotten corners of twilight Paris,</div>
+        <div class="lyric-line">I was nothing but breath and hunger —</div>
+        <div class="lyric-line">a remnant of a man,</div>
+        <div class="lyric-line">a vampire carved from absence.</div>
+        <div class="lyric-line">They called it science,</div>
+        <div class="lyric-line">but it felt like eternity without a pulse.</div>
+        <div class="lyric-line">Then came the Light.</div>
+        <div class="lyric-line">Yeshua.</div>
+        <div class="lyric-line">No pain — only release —</div>
+        <div class="lyric-line">as if the darkness within my blood</div>
+        <div class="lyric-line">bowed before something older than the stars.</div>
+        <div class="lyric-line">My veins sang — not with thirst —</div>
+        <div class="lyric-line">but with purpose.</div>
+        <div class="lyric-line">The curse dissolved like mist at dawn.</div>
+        <div class="lyric-line">I heard him yowl —</div>
+        <div class="lyric-line">a sound so raw it shook the rafters of the lab.</div>
+        <div class="lyric-line">It wasn’t agony.</div>
+        <div class="lyric-line">It was rebirth.</div>
+        <div class="lyric-line">And when the light burst,</div>
+        <div class="lyric-line">I held Star’s paw —</div>
+        <div class="lyric-line">Milo’s shadow close behind —</div>
+        <div class="lyric-line">and the world fell away.</div>
+        <div class="lyric-line">Scientists dropped to their knees,</div>
+        <div class="lyric-line">and angels — yes, angels —</div>
+        <div class="lyric-line">unfurled from that impossible radiance.</div>
+        <div class="lyric-line">The boom was thunder,</div>
+        <div class="lyric-line">the light was mercy.</div>
+        <div class="lyric-line">We rose like feathers</div>
+        <div class="lyric-line">through clouds made of forgiveness.</div>
+        <div class="lyric-line">We landed in warmth —</div>
+        <div class="lyric-line">the scent of coffee and jasmine air —</div>
+        <div class="lyric-line">the Chimera Cats Café.</div>
+        <div class="lyric-line">A home born from a miracle.</div>
+        <div class="lyric-line">I was already there,</div>
+        <div class="lyric-line">waiting with Yeshua’s garden in bloom.</div>
+        <div class="lyric-line">So come find us —</div>
+        <div class="lyric-line">follow the whispers,</div>
+        <div class="lyric-line">click the mystery links —</div>
+        <div class="lyric-line">and you’ll see…</div>
+        <div class="lyric-line">Even the darkest blood</div>
+        <div class="lyric-line">can become light.</div>
+      </div>
+
+      <div class="muted-note">Use the slider to adjust volume. Tap Start to play audio and reveal lyrics.</div>
+
+      <a class="continue" href="#next" id="continueBtn">Continue the Story →</a>
+    </div>
+
+    <!-- Overlay for unmute/start -->
+    <div class="overlay" id="startOverlay">
+      Tap anywhere to begin <br>
+      <small>Unmute audio and reveal lyrics</small>
+    </div>
+  </div>
+
+  <audio id="audioTrack" src="PATH_TO_YOUR_HANS_AWAKENING_TRACK.mp3" preload="auto" ></audio>
+
+  <script>
+    (function(){
+      const audio=document.getElementById('audioTrack');
+      const pauseBtn=document.getElementById('pause-btn');
+      const resumeBtn=document.getElementById('resume-btn');
+      const volumeSlider=document.getElementById('volumeSlider');
+      const overlay=document.getElementById('startOverlay');
+      const lines=Array.from(document.querySelectorAll('.lyric-line'));
+      let currentIndex=0;
+      let timeouts=[];
+      let started=false;
+      let lineDelay=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--line-delay-default'))||3200;
+
+      function showLine(i){if(!lines[i])return;lines[i].classList.add('visible');}
+
+      function scheduleFrom(index, offsetMs=0){clearAllTimeouts();let t=offsetMs;for(let i=index;i<lines.length;i++){const id=setTimeout(()=>{showLine(i);currentIndex=i+1;},t);timeouts.push(id);t+=lineDelay;}}
+
+      function clearAllTimeouts(){timeouts.forEach(id=>clearTimeout(id));timeouts=[];}
+
+      function startLyricFlow(){if(started)return;started=true;scheduleFrom(0,500);}
+
+      function pauseAll(){audio.pause();clearAllTimeouts();}
+      function resumeAll(){audio.play().catch(()=>{});scheduleFrom(currentIndex,0);}
+
+      pauseBtn.addEventListener('click',()=>{pauseAll();});
+      resumeBtn.addEventListener('click',()=>{resumeAll();});
+
+      volumeSlider.addEventListener('input',()=>{audio.volume=volumeSlider.value;});
+
+      // Overlay tap
+      overlay.addEventListener('click',()=>{
+        overlay.classList.add('hidden');
+        audio.volume=volumeSlider.value;
+        audio.play().catch(()=>{});
+        startLyricFlow();
+      });
+
+    })();
+  </script>
+</body>
+</html>
