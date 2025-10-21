@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hans’ Awakening</title>
+<style>
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    height: 100vh;
+    font-family: "Cinzel", serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+
+  .controls {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .controls button {
+    background: transparent;
+    border: 1px solid cornflowerblue;
+    color: cornflowerblue;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .controls button:hover {
+    background: cornflowerblue;
+    color: black;
+  }
+
+  .controls input[type=range] {
+    accent-color: cornflowerblue;
+  }
+
+  .lyrics {
+    position: absolute;
+    bottom: 25%;
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    overflow: hidden;
+    z-index: 4;
+  }
+
+  .lyric-line {
+    position: absolute;
+    right: 100%;
+    white-space: nowrap;
+    font-size: 22px;
+    letter-spacing: 1px;
+    opacity: 0;
+    background: linear-gradient(90deg, cornflowerblue, grey);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 6px rgba(100,149,237,0.4));
+    transition: opacity 1s ease;
+  }
+
+  .lyric-line.visible {
+    animation: gentleScrollLTR 20s linear forwards, lyricGlow 8s ease-in-out infinite;
+  }
+
+  @keyframes gentleScrollLTR {
+    0% { right: 100%; opacity: 0; }
+    10% { opacity: 1; }
+    50% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { right: -100%; opacity: 0; }
+  }
+
+  @keyframes lyricGlow {
+    0%,100% {
+      filter: drop-shadow(0 0 6px rgba(100,149,237,0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 14px rgba(135,206,235,0.7));
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<audio id="audio" src="YOUR_AUDIO_URL_HERE.mp3" preload="auto"></audio>
+
+<div class="controls">
+  <button id="playBtn">▶</button>
+  <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8">
+</div>
+
+<div class="lyrics" id="lyrics">
+  <div class="lyric-line">In the forgotten corners of twilight Paris...</div>
+  <div class="lyric-line">Where candlelight trembles on rain-slick streets...</div>
+  <div class="lyric-line">Hans remembers the darkness in his blood...</div>
+  <div class="lyric-line">Until Yeshua’s light freed him from the curse...</div>
+  <div class="lyric-line">The lab shattered, and angels lifted them away...</div>
+  <div class="lyric-line">The Chimera Cats Café was born from starlight.</div>
+</div>
+
+<script>
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Starfield Setup
+const stars = [];
+const numStars = 120;
+
+for (let i = 0; i < numStars; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 2,
+    speed: 0.1 + Math.random() * 0.3,  // slower for melodic pace
+    opacity: 0.3 + Math.random() * 0.7
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.size, 0, 2 * Math.PI);
+    ctx.fillStyle = `rgba(100,149,237,${star.opacity})`;
+    ctx.fill();
+
+    star.y -= star.speed;
+    if (star.y < -2) {
+      star.y = canvas.height + 2;
+      star.x = Math.random() * canvas.width;
+    }
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// Audio Controls
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const volumeControl = document.getElementById('volumeControl');
+let started = false;
+
+playBtn.addEventListener('click', () => {
+  if (!started) {
+    startAudio();
+  } else if (audio.paused) {
+    audio.play();
+    playBtn.textContent = '⏸';
+  } else {
+    audio.pause();
+    playBtn.textContent = '▶';
+  }
+});
+
+volumeControl.addEventListener('input', () => {
+  audio.volume = volumeControl.value;
+});
+
+function startAudio() {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(audioCtx.destination);
+  audio.play();
+  playBtn.textContent = '⏸';
+  started = true;
+  requestAnimationFrame(lyricLoop);
+}
+
+// Lyrics Animation
+const lines = document.querySelectorAll('.lyric-line');
+let currentLine = 0;
+let lastTime = 0;
+
+function showLine(i) {
+  if (!lines[i]) return;
+  const line = lines[i];
+  line.classList.add('visible');
+  setTimeout(() => {
+    line.classList.remove('visible');
+  }, 20000); // slower lyric fade time
+}
+
+function lyricLoop(timestamp) {
+  if (!started) return;
+  if (!lastTime) lastTime = timestamp;
+  const elapsed = timestamp - lastTime;
+
+  if (currentLine < lines.length && elapsed >= 10000) {
+    showLine(currentLine++);
+    lastTime = timestamp;
+  }
+
+  requestAnimationFrame(lyricLoop);
+}
+</script>
+</body>
+</html>
