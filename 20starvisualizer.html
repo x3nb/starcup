@@ -1,252 +1,256 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Hans' Awakening — Chimera Cats Café</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hans’ Awakening</title>
 <style>
-:root{
-  --bg:#000;
-  --color-start:#6495ED;
-  --color-end:#C0C0C0;
-  --fade-time:900ms;
-  --line-delay:3200ms;
-}
-html,body{
-  height:100%;
-  margin:0;
-  background:var(--bg);
-  font-family:"Cinzel","Cormorant Garamond",Georgia,serif;
-  color:white;
-  overflow:hidden;
-}
-.page{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  overflow:hidden;
-}
-#visualizer{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:1;
-}
-.stage{
-  position:relative;
-  z-index:3;
-  text-align:center;
-  width:90%;
-  max-width:900px;
-}
-.play-dial{
-  width:110px;
-  height:110px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:radial-gradient(circle at 35% 30%, rgba(100,149,237,0.12), rgba(192,192,192,0.03));
-  box-shadow:0 6px 20px rgba(100,149,237,0.06);
-  border:1px solid rgba(100,149,237,0.15);
-  margin:10px auto 20px;
-  cursor:pointer;
-  transition:transform .15s;
-}
-.play-dial:hover{transform:scale(1.05);}
-.play-dial .icon{width:52px;height:52px;transform:translateX(4px);}
-.lyrics{
-  position:relative;
-  overflow-y:auto;
-  height:55vh;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-}
-.lyrics::-webkit-scrollbar{display:none;}
-.lyric-line{
-  font-size:20px;
-  margin:18px 0;
-  opacity:0;
-  transform:translateY(15px);
-  transition:opacity var(--fade-time) ease, transform var(--fade-time) ease;
-  background:linear-gradient(90deg,var(--color-start),var(--color-end));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
-}
-.lyric-line.visible{
-  opacity:1;
-  transform:translateY(0);
-}
-.controls{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:12px;
-  margin-top:10px;
-}
-.btn{
-  background:transparent;
-  border:1px solid rgba(100,149,237,0.25);
-  color:var(--color-start);
-  padding:6px 14px;
-  cursor:pointer;
-  border-radius:8px;
-}
-.btn.primary{
-  background:rgba(100,149,237,0.12);
-  color:white;
-}
-.volume-control{width:180px;}
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.9);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  color:var(--color-start);
-  font-size:22px;
-  z-index:5;
-  cursor:pointer;
-  transition:opacity .4s;
-}
-.overlay.hidden{opacity:0;visibility:hidden;}
+  body {
+    margin: 0;
+    height: 100vh;
+    background: black;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Cinzel", serif;
+  }
+
+  /* Canvas for bubbles */
+  #visualizer {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    z-index: 1;
+  }
+
+  /* Audio controls */
+  .controls {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .controls button {
+    background: transparent;
+    border: 1px solid cornflowerblue;
+    color: cornflowerblue;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .controls button:hover {
+    background: cornflowerblue;
+    color: black;
+  }
+
+  .controls input[type=range] {
+    accent-color: cornflowerblue;
+  }
+
+  /* Lyrics container */
+  .lyrics {
+    position: absolute;
+    bottom: 20%;
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    text-align: center;
+    z-index: 4;
+  }
+
+  /* Individual lyric lines */
+  .lyric-line {
+    position: absolute;
+    right: 100%;
+    white-space: nowrap;
+    font-size: 22px;
+    letter-spacing: 1px;
+    opacity: 0;
+    background: linear-gradient(90deg, cornflowerblue, grey);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 0 8px rgba(100,149,237,0.6))
+            drop-shadow(0 0 20px rgba(128,128,128,0.4));
+    transition: opacity var(--fade-time, 1s) ease;
+  }
+
+  /* Animate lyric line left-to-right */
+  .lyric-line.visible {
+    animation: scrollLineLTR 9s linear forwards, glowTrail 3s ease-in-out infinite;
+  }
+
+  @keyframes scrollLineLTR {
+    0% {
+      right: 100%;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      right: -100%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes glowTrail {
+    0% {
+      filter: drop-shadow(0 0 8px rgba(100,149,237,0.5))
+              drop-shadow(0 0 20px rgba(128,128,128,0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 14px rgba(100,149,237,0.8))
+              drop-shadow(0 0 30px rgba(128,128,128,0.6));
+    }
+    100% {
+      filter: drop-shadow(0 0 8px rgba(100,149,237,0.5))
+              drop-shadow(0 0 20px rgba(128,128,128,0.4));
+    }
+  }
 </style>
 </head>
 <body>
-<div class="page">
-  <canvas id="visualizer"></canvas>
-  <div class="stage">
-    <div class="play-dial" id="playDial">
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 3v18l15-9z" stroke="url(#g)"></path>
-        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6495ED"/><stop offset="1" stop-color="#C0C0C0"/></linearGradient></defs>
-      </svg>
-    </div>
+<canvas id="visualizer"></canvas>
 
-    <div class="controls">
-      <button id="pause-btn" class="btn">Pause</button>
-      <button id="resume-btn" class="btn primary">Resume</button>
-      <input type="range" min="0" max="1" step="0.01" value="1" id="volumeSlider" class="volume-control"/>
-    </div>
+<audio id="audio" src="YOUR_AUDIO_URL_HERE.mp3" preload="auto"></audio>
 
-    <div class="lyrics" id="lyricsContainer">
-      <div class="lyric-line">In the forgotten corners of twilight Paris,</div>
-      <div class="lyric-line">I was nothing but breath and hunger —</div>
-      <div class="lyric-line">a remnant of a man,</div>
-      <div class="lyric-line">a vampire carved from absence.</div>
-      <div class="lyric-line">Then came the Light.</div>
-      <div class="lyric-line">Yeshua.</div>
-      <div class="lyric-line">No pain — only release —</div>
-      <div class="lyric-line">as if the darkness within my blood</div>
-      <div class="lyric-line">bowed before something older than the stars.</div>
-      <div class="lyric-line">We landed in warmth —</div>
-      <div class="lyric-line">the Chimera Cats Café.</div>
-    </div>
-  </div>
-  <div class="overlay" id="startOverlay">Tap anywhere to begin<br><small>Unmute audio and reveal lyrics</small></div>
+<div class="controls">
+  <button id="playBtn">▶</button>
+  <input id="volumeControl" type="range" min="0" max="1" step="0.01" value="0.8">
 </div>
 
-<audio id="audioTrack" src="audio/lorefinal.mp3" preload="auto"></audio>
+<div class="lyrics" id="lyrics">
+  <div class="lyric-line">In the forgotten corners of twilight Paris...</div>
+  <div class="lyric-line">Where candlelight trembles on rain-slick streets...</div>
+  <div class="lyric-line">Hans remembers the darkness in his blood...</div>
+  <div class="lyric-line">Until Yeshua’s light freed him from the curse...</div>
+  <div class="lyric-line">The lab shattered, the angels lifted them away...</div>
+  <div class="lyric-line">And the Chimera Cats Café was born from starlight.</div>
+</div>
 
 <script>
-(function(){
-  const audio = document.getElementById('audioTrack');
-  const pauseBtn = document.getElementById('pause-btn');
-  const resumeBtn = document.getElementById('resume-btn');
-  const volumeSlider = document.getElementById('volumeSlider');
-  const overlay = document.getElementById('startOverlay');
-  const playDial = document.getElementById('playDial');
-  const lines = Array.from(document.querySelectorAll('.lyric-line'));
-  const container = document.getElementById('lyricsContainer');
-  const canvas = document.getElementById('visualizer');
-  const ctx = canvas.getContext('2d');
-  let started=false, currentLine=0, lastTime=0;
+const audio = document.getElementById('audio');
+const playBtn = document.getElementById('playBtn');
+const volumeControl = document.getElementById('volumeControl');
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+const lines = document.querySelectorAll('.lyric-line');
 
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
+let audioCtx, analyser, source, dataArray;
+let started = false;
+let currentLine = 0;
+let lastTime = 0;
 
-  // audio context + analyzer
-  const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  const src = audioCtx.createMediaElementSource(audio);
-  const analyser = audioCtx.createAnalyser();
-  src.connect(analyser);
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+playBtn.addEventListener('click', () => {
+  if (!started) {
+    startAudio();
+  } else if (audio.paused) {
+    audio.play();
+    playBtn.textContent = '⏸';
+  } else {
+    audio.pause();
+    playBtn.textContent = '▶';
+  }
+});
+
+volumeControl.addEventListener('input', () => {
+  audio.volume = volumeControl.value;
+});
+
+function startAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
   analyser.connect(audioCtx.destination);
   analyser.fftSize = 256;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-  // bubbles refined
-  const bubbles = Array.from({length:90},()=>({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    baseRadius:Math.random()*2+0.5,
-    freqIndex:Math.floor(Math.random()*bufferLength),
-    speed:Math.random()*0.4+0.1
-  }));
+  audio.play();
+  playBtn.textContent = '⏸';
+  started = true;
+  requestAnimationFrame(drawVisualizer);
+  requestAnimationFrame(lyricLoop);
+}
 
-  function draw(){
-    requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(dataArray);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    bubbles.forEach(b=>{
-      const amp=dataArray[b.freqIndex]/255;
-      b.y -= b.speed + amp*0.3;
-      if(b.y<0){b.y=canvas.height; b.x=Math.random()*canvas.width;}
-      ctx.beginPath();
-      ctx.arc(b.x,b.y,b.baseRadius+amp*2,0,Math.PI*2);
-      ctx.fillStyle=`rgba(100,149,237,${0.15+amp*0.3})`;
-      ctx.fill();
-    });
-  }
-  draw();
+function drawVisualizer() {
+  if (!started) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  analyser.getByteFrequencyData(dataArray);
+  const bubbleCount = 30;
 
-  function showLine(i){
-    if(!lines[i]) return;
-    lines[i].classList.add('visible');
-    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+  for (let i = 0; i < bubbleCount; i++) {
+    const x = Math.random() * canvas.width;
+    const y = canvas.height - (dataArray[i] * 2);
+    const size = dataArray[i] / 10;
+    const alpha = Math.min(1, dataArray[i] / 128);
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, 2 * Math.PI);
+    ctx.fillStyle = `rgba(100,149,237,${alpha})`;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = 'cornflowerblue';
+    ctx.fill();
   }
 
-  function lyricLoop(timestamp){
-    if(!started) return;
-    if(!lastTime) lastTime=timestamp;
-    const elapsed=timestamp-lastTime;
-    if(currentLine<lines.length && elapsed>=3200){
-      showLine(currentLine++);
-      lastTime=timestamp;
-    }
-    requestAnimationFrame(lyricLoop);
+  requestAnimationFrame(drawVisualizer);
+}
+
+function showLine(i) {
+  if (!lines[i]) return;
+  const line = lines[i];
+  line.classList.add('visible');
+
+  // Pulse effect: brighten bubbles slightly when new lyric appears
+  pulseBubbles();
+
+  setTimeout(() => {
+    line.classList.remove('visible');
+  }, 9000);
+}
+
+function lyricLoop(timestamp) {
+  if (!started) return;
+  if (!lastTime) lastTime = timestamp;
+  const elapsed = timestamp - lastTime;
+
+  if (currentLine < lines.length && elapsed >= 4200) {
+    showLine(currentLine++);
+    lastTime = timestamp;
   }
 
-  function startLyrics(){
-    if(started) return;
-    started=true;
-    requestAnimationFrame(lyricLoop);
-  }
+  requestAnimationFrame(lyricLoop);
+}
 
-  overlay.addEventListener('click',async()=>{
-    overlay.classList.add('hidden');
-    await audioCtx.resume();
-    audio.play();
-    startLyrics();
-  });
-  playDial.addEventListener('click',async()=>{
-    overlay.classList.add('hidden');
-    await audioCtx.resume();
-    audio.play();
-    startLyrics();
-  });
-  pauseBtn.onclick=()=>audio.pause();
-  resumeBtn.onclick=()=>audio.play();
-  volumeSlider.oninput=()=>audio.volume=volumeSlider.value;
-})();
+/* Simple synchronized pulse for bubble glow */
+function pulseBubbles() {
+  ctx.globalAlpha = 0.9;
+  for (let i = 0; i < 20; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const r = Math.random() * 8 + 2;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(173,216,230,0.3)';
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
 </script>
 </body>
 </html>
