@@ -105,6 +105,12 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormor
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
 
+  // Particle system
+  const particles=[];
+  for(let i=0;i<100;i++){
+    particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*3+1, speed:Math.random()*1+0.3, opacity:Math.random()*0.8+0.2});
+  }
+
   function showLine(i){if(!lines[i])return; lines[i].classList.add('visible');}
   function clearAllTimeouts(){timeouts.forEach(t=>clearTimeout(t)); timeouts=[];}
   function scheduleFrom(index, offset=0){clearAllTimeouts(); let t=offset; for(let i=index;i<lines.length;i++){timeouts.push(setTimeout(()=>{showLine(i); currentIndex=i+1;}, t)); t+=lineDelay;}}
@@ -134,18 +140,35 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormor
     requestAnimationFrame(drawVisualizer);
     analyser.getByteFrequencyData(dataArray);
     ctx.clearRect(0,0,canvas.width,canvas.height);
-    const barWidth = canvas.width / bufferLength;
+
+    const barWidth = (canvas.width / bufferLength) * 1.5;
     for(let i=0;i<bufferLength;i++){
-      const barHeight = dataArray[i]/2;
-      const x = i*barWidth;
-      ctx.fillStyle=`rgba(${100+barHeight},149,237,0.5)`;
-      ctx.fillRect(x, canvas.height-barHeight, barWidth, barHeight);
+      const barHeight = dataArray[i]*1.5;
+      const x = i * barWidth;
+      const gradient = ctx.createLinearGradient(x,canvas.height-barHeight,x,canvas.height);
+      gradient.addColorStop(0,'rgba(100,149,237,0.8)');
+      gradient.addColorStop(1,'rgba(192,192,192,0.4)');
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = 'rgba(100,149,237,0.6)';
+      ctx.shadowBlur = 16;
+      ctx.fillRect(x, canvas.height-barHeight, barWidth-1, barHeight);
+    }
+
+    // Draw particles
+    for(let p of particles){
+      p.y -= p.speed;
+      p.opacity -= 0.005;
+      if(p.opacity<=0){p.y=canvas.height; p.opacity=1; p.x=Math.random()*canvas.width;}
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(100,149,237,${p.opacity})`;
+      ctx.fill();
     }
   }
   drawVisualizer();
-
 })();
 </script>
 </body>
 </html>
+
 
