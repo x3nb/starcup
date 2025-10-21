@@ -55,11 +55,6 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormor
 .lyric-line.visible{
   opacity:1;
   transform:translateY(0) scale(1);
-  animation: slideUp 1s ease forwards;
-}
-@keyframes slideUp{
-  0% { transform: translateY(14px) scale(.995);}
-  100% { transform: translateY(0) scale(1);}
 }
 @media(max-width:600px){.lyric-line{font-size:16px;}.play-dial{width:100px;height:100px;}}
 .continue{margin-top:28px;display:inline-block;color:var(--color-start);border:1px solid rgba(100,149,237,0.12);padding:10px 16px;border-radius:10px;text-decoration:none;transition: transform .12s ease;}
@@ -141,25 +136,45 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormor
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
 
-  // Particle system
-  const particles=[];
-  for(let i=0;i<100;i++){
-    particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, size:Math.random()*3+1, speed:Math.random()*1+0.3, opacity:Math.random()*0.8+0.2});
+  // bubbles visualizer
+  const bubbleCount = 120;
+  const bubbles = [];
+  for(let i=0;i<bubbleCount;i++){
+    bubbles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      baseRadius: Math.random()*4+2,
+      radius:0,
+      speed: Math.random()*0.5 + 0.2,
+      freqIndex: Math.floor(Math.random()*bufferLength)
+    });
   }
 
-  let pulseActive=false;
-  function triggerPulse(){
-    pulseActive=true;
-    particles.forEach(p => { p.speed *=2; p.size *=1.5; });
-    setTimeout(()=>{pulseActive=false; particles.forEach(p=>{p.speed/=2;p.size/=1.5;});},800);
+  function drawBubbles(){
+    requestAnimationFrame(drawBubbles);
+    analyser.getByteFrequencyData(dataArray);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    bubbles.forEach(b=>{
+      const amplitude = dataArray[b.freqIndex]/255;
+      b.radius = b.baseRadius + amplitude*20;
+      b.y -= b.speed;
+      if(b.y<0) b.y = canvas.height;
+      ctx.beginPath();
+      ctx.arc(b.x,b.y,b.radius,0,Math.PI*2);
+      ctx.fillStyle = `rgba(100,149,237,${0.4+amplitude*0.6})`;
+      ctx.shadowColor = `rgba(100,149,237,${0.6+amplitude*0.4})`;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    });
   }
+
+  drawBubbles();
 
   function showLine(i){
-    if(!lines[i])return;
+    if(!lines[i]) return;
     lines[i].classList.add('visible');
     const container = document.getElementById('lyricsContainer');
     container.scrollTop = container.scrollHeight;
-    if(lines[i].dataset.pulse) triggerPulse();
   }
 
   function lyricLoop(timestamp){
@@ -193,41 +208,6 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:"Cinzel","Cormor
   });
 
   audio.addEventListener('error', e=>{console.error("Audio failed to load",e);});
-
-  function drawVisualizer(){
-    requestAnimationFrame(drawVisualizer);
-    analyser.getByteFrequencyData(dataArray);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    const barWidth=(canvas.width/bufferLength)*1.5;
-    for(let i=0;i<bufferLength;i++){
-      const barHeight=dataArray[i]*1.5;
-      const x=i*barWidth;
-      const gradient=ctx.createLinearGradient(x,canvas.height-barHeight,x,canvas.height);
-      gradient.addColorStop(0,pulseActive?'rgba(100,149,237,1)':'rgba(100,149,237,0.8)');
-      gradient.addColorStop(1,pulseActive?'rgba(192,192,192,0.6)':'rgba(192,192,192,0.4)');
-      ctx.fillStyle=gradient;
-      ctx.shadowColor=pulseActive?'rgba(100,149,237,0.8)':'rgba(100,149,237,0.6)';
-      ctx.shadowBlur=pulseActive?32:16;
-      ctx.fillRect(x,canvas.height-barHeight,barWidth-1,barHeight);
-    }
-
-    for(let p of particles){
-      p.y-=p.speed;
-      p.opacity-=0.005;
-      if(p.opacity<=0){p.y=canvas.height; p.opacity=1; p.x=Math.random()*canvas.width;}
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-      ctx.fillStyle=`rgba(100,149,237,${p.opacity})`;
-      ctx.fill();
-    }
-  }
-  drawVisualizer();
-
-  // Attempt autoplay after short delay
-  setTimeout(async ()=>{
-    try{await audioCtx.resume(); await audio.play(); startLyricFlow();}catch(e){console.log("Autoplay blocked, wait for user interaction");}
-  },500);
 
 })();
 </script>
