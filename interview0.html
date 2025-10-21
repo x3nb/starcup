@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chimera RPG Quest Club</title>
+<style>
+  body {
+    margin: 0;
+    background-color: black;
+    font-family: 'Arial', sans-serif;
+    color: #b0c4de; /* grey-ombre cornflowerblue */
+    overflow: hidden;
+  }
+
+  /* Common styles */
+  .centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+  }
+
+  /* Floating title */
+  #floating-title {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #7fb0f5; /* cornflowerblue shade */
+    animation: float 2s infinite alternate;
+  }
+
+  @keyframes float {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+  }
+
+  /* Emoji style */
+  #coffee-emoji {
+    font-size: 5em;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  #coffee-emoji:hover {
+    transform: scale(1.1);
+  }
+
+  /* Twilight zone effect */
+  #transition {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom:0;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3em;
+    color: #b0c4de;
+    opacity: 0;
+    z-index: 10;
+    transition: opacity 2s, filter 2s;
+  }
+
+  /* Hidden by default */
+  .hidden {
+    display: none;
+  }
+
+  /* Quiz styles */
+ .quiz-container {
+    max-width: 600px;
+    margin: 20px auto;
+  }
+
+  button {
+    background-color: #7fb0f5;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    border-radius: 5px;
+  }
+
+  button:hover {
+    background-color: #5aa0e0;
+  }
+
+  /* Certificate download style */
+  #certificate {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- Initial Scene -->
+<div id="initialScene" class="centered">
+  <div id="floating-title">Enter on your own will</div>
+  <div id="coffee-container">
+    <div id="coffee-emoji">☕️</div>
+  </div>
+</div>
+
+<!-- Transition Effect -->
+<div id="transition"></div>
+
+<!-- Welcome and Name Prompt -->
+<div id="namePrompt" class="centered hidden">
+  <h1>Welcome</h1>
+  <div id="nameQuestion">
+    <p>What should we call you?</p>
+    <input type="text" id="userName" placeholder="Your name" />
+    <button id="confirmName">Confirm</button>
+  </div>
+</div>
+
+<!-- Name Confirmation -->
+<div id="nameConfirmation" class="centered hidden">
+  <p>Is "<span id="displayName"></span>" your favorite name?</p>
+  <button id="nameYes">Yes</button>
+  <button id="nameNo">No, I also go by this name</button>
+</div>
+
+<!-- Adventure Prompt -->
+<div id="adventurePrompt" class="centered hidden">
+  <p>In this realm you can call yourself any and many names, we don't mind at all, feel free to choose and be yourself or selves, free your mind.</p>
+  <p>Shall we begin our adventure in the new realm?</p>
+  <button id="beginYes">Yes</button>
+  <button id="beginNo">No</button>
+</div>
+
+<!-- Trivia Questions -->
+<div id="quizSection" class="centered hidden">
+  <div class="quiz-container">
+    <div id="questionContainer"></div>
+    <div id="answerContainer"></div>
+    <button id="submitAnswer" style="display:none;">Submit</button>
+  </div>
+</div>
+
+<!-- Certificate Download -->
+<div id="certificateSection" class="centered">
+  <h2>Congratulations!</h2>
+  <p>You are now a member of the Chimera RPG Quest Club.</p>
+  <button id="downloadCert">Download Your Certificate</button>
+</div>
+
+<!-- Lore Link -->
+<div id="loreSection" class="centered hidden">
+  <h2>Learn the Lore</h2>
+  <p><a href="#" target="_blank" style="color: #7fb0f5;">Click here to read the lore of the website</a></p>
+</div>
+
+<script>
+  const initialScene = document.getElementById('initialScene');
+  const floatingTitle = document.getElementById('floating-title');
+  const coffeeEmoji = document.getElementById('coffee-emoji');
+  const transitionDiv = document.getElementById('transition');
+
+  const namePrompt = document.getElementById('namePrompt');
+  const nameQuestion = document.getElementById('nameQuestion');
+  const userNameInput = document.getElementById('userName');
+  const confirmNameBtn = document.getElementById('confirmName');
+
+  const nameConfirmation = document.getElementById('nameConfirmation');
+  const displayNameSpan = document.getElementById('displayName');
+  const nameYesBtn = document.getElementById('nameYes');
+  const nameNoBtn = document.getElementById('nameNo');
+
+  const adventurePrompt = document.getElementById('adventurePrompt');
+  const beginYesBtn = document.getElementById('beginYes');
+  const beginNoBtn = document.getElementById('beginNo');
+
+  const quizSection = document.getElementById('quizSection');
+  const questionContainer = document.getElementById('questionContainer');
+  const answerContainer = document.getElementById('answerContainer');
+  const submitAnswerBtn = document.getElementById('submitAnswer');
+
+  const certificateSection = document.getElementById('certificateSection');
+  const downloadCertBtn = document.getElementById('downloadCert');
+
+  const loreSection = document.getElementById('loreSection');
+
+  let userName = '';
+  let currentQuestionIndex = 0;
+  let correctAnswers = 0;
+
+  const questions = [
+    {
+      question: "What is the meaning of life?",
+      options: ["To find happiness", "To serve others", "To understand oneself", "It's a mystery"],
+      answer: 3
+    },
+    {
+      question: "If a tree falls in a forest and no one is around to hear it, does it make a sound?",
+      options: ["Yes", "No", "Maybe", "It's complicated"],
+      answer: 0
+    },
+    {
+      question: "Can consciousness exist without perception?",
+      options: ["Yes", "No", "Perhaps", "Never"],
+      answer: 1
+    }
+  ];
+
+  // Function to start the fizzle transition
+  function startTransition() {
+    transitionDiv.style.opacity = '1';
+    transitionDiv.style.filter = 'blur(10px)';
+    setTimeout(() => {
+      transitionDiv.style.opacity = '0';
+      transitionDiv.style.filter = 'blur(0)';
+      setTimeout(() => {
+        transitionDiv.style.display = 'none';
+        showNamePrompt();
+      }, 2000);
+    }, 2000);
+  }
+
+  // Show name prompt
+  function showNamePrompt() {
+    initialScene.classList.add('hidden');
+    namePrompt.classList.remove('hidden');
+  }
+
+  // Event listener for coffee emoji click
+  coffeeEmoji.addEventListener('click', () => {
+    startTransition();
+  });
+
+  // Confirm name
+  document.getElementById('confirmName').addEventListener('click', () => {
+    const nameInput = userNameInput.value.trim();
+    if (nameInput) {
+      userName = nameInput;
+      displayNameSpan.textContent = userName;
+      namePrompt.classList.add('hidden');
+      showNameConfirmation();
+    } else {
+      alert('Please enter a name.');
+    }
+  });
+
+  function showNameConfirmation() {
+    nameConfirmation.classList.remove('hidden');
+  }
+
+  // Name confirmation buttons
+  document.getElementById('nameYes').addEventListener('click', () => {
+    nameConfirmation.classList.add('hidden');
+    showAdventurePrompt();
+  });
+
+  document.getElementById('nameNo').addEventListener('click', () => {
+    nameConfirmation.classList.add('hidden');
+    showNamePrompt();
+  });
+
+  // Show adventure prompt
+  function showAdventurePrompt() {
+    adventurePrompt.classList.remove('hidden');
+  }
+
+  document.getElementById('beginYes').addEventListener('click', () => {
+    adventurePrompt.classList.add('hidden');
+    startQuiz();
+  });
+
+  document.getElementById('beginNo').addEventListener('click', () => {
+    adventurePrompt.classList.add('hidden');
+    // Restart to beginning
+    initialScene.classList.remove('hidden');
+    // Reset name input
+    userName = '';
+    userNameInput.value = '';
+  });
+
+  // Start quiz
+  function startQuiz() {
+    document.getElementById('initialScene').classList.add('hidden');
+    quizSection.classList.remove('hidden');
+    currentQuestionIndex = 0;
+    correctAnswers = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = questions[currentQuestionIndex];
+    questionContainer.innerHTML = `<p>${q.question}</p>`;
+    answerContainer.innerHTML = '';
+    q.options.forEach((opt, index) => {
+      const radioHtml = `<label><input type="radio" name="answer" value="${index}"> ${opt}</label><br>`;
+      answerContainer.innerHTML += radioHtml;
+    });
+    submitAnswerBtn.style.display = 'inline-block';
+  }
+
+  document.getElementById('submitAnswer').addEventListener('click', () => {
+    const selected = document.querySelector('input[name="answer"]:checked');
+    if (selected) {
+      const answerIndex = parseInt(selected.value);
+      const q = questions[currentQuestionIndex];
+      if (answerIndex === q.answer) {
+        correctAnswers++;
+      }
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questions.length) {
+        showQuestion();
+      } else {
+        // End of quiz
+        showCertificate();
+      }
+    } else {
+      alert('Please select an answer.');
+    }
+  });
+
+  function showCertificate() {
+    quizSection.classList.add('hidden');
+    document.getElementById('certificate').style.display = 'block';
+  }
+
+  // Download certificate
+  document.getElementById('downloadCert').addEventListener('click', () => {
+    const certificateText = `
+      <html>
+        <head>
+          <title>Chimera RPG Quest Club Certificate</title>
+        </head>
+        <body style="background-color: black; color: #b0c4de; font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="font-size: 2em;">🌟 Chimera RPG Quest Club 🌟</h1>
+          <p>This certifies that <strong>${userName}</strong> is a member of the</p>
+          <h2>Chimera RPG Quest Club</h2>
+          <p style="margin-top: 20px;">🎖️</p>
+          <p style="margin-top: 20px;">Enjoy your adventures!</p>
+          <img src="https://i.imgur.com/TEb5pvz.png" alt="Tea Stamp" width="100"/>
+        </body>
+      </html>
+    `;
+    const blob = new Blob([certificateText], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${userName}_Certificate.html`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    // After download, show lore link
+    document.getElementById('certificate').style.display = 'none';
+    showLore();
+  });
+
+  function showLore() {
+    document.getElementById('loreSection').classList.remove('hidden');
+  }
+
+  // Optional: Add more interactions for lore link
+</script>
+</body>
+</html>
