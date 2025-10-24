@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -184,6 +184,7 @@
         }
         
     /* Optional: Add a smooth glow animation or static glow */
+  <style>
     #cafe-video {
       width: 200px;
       height: auto;
@@ -196,9 +197,39 @@
 
     #cafe-video:hover {
       box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
+      /* Trigger glitch on hover for subtle effect */
+      animation: glitchHover 1s ease-in-out infinite;
     }
 
-    /* Glitch effect keyframes extended to ~3 seconds */
+    /* Define a separate keyframes for hover glitch */
+    @keyframes glitchHover {
+      0% {
+        transform: skew(0deg);
+        filter: contrast(1);
+      }
+      20% {
+        transform: skew(-1deg);
+        filter: contrast(1.2) hue-rotate(-2deg);
+      }
+      40% {
+        transform: skew(1deg);
+        filter: contrast(0.8) hue-rotate(2deg);
+      }
+      60% {
+        transform: skew(-1deg);
+        filter: contrast(1.1);
+      }
+      80% {
+        transform: skew(0deg);
+        filter: contrast(1);
+      }
+      100% {
+        transform: skew(0deg);
+        filter: contrast(1);
+      }
+    }
+
+    /* Glitch effect for click, same as before but triggered via class */
     @keyframes glitch {
       0% {
         transform: none;
@@ -222,10 +253,9 @@
       }
     }
 
-    /* Class to trigger glitch effect with longer duration */
     .glitch {
       animation: glitch 3s ease-in-out forwards;
-    } 
+    }
 </style>
 </head>
 <body>
