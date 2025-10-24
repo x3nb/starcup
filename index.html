@@ -189,21 +189,7 @@
       height: auto;
       border-radius: 50%;
       object-fit: cover;
-      box-shadow: 0 0 15px 4px rgba(100, 149, 237, 0.7); /* Cornflower blue glow */
-      cursor: pointer;
-      transition: box-shadow 0.3s ease;
-    }
-
-    /* Optional: intensify glow on hover for subtle effect */
-    #cafe-video:hover {
-      box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
-    }
- #cafe-video {
-      width: 200px;
-      height: auto;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 0 15px 4px rgba(100, 149, 237, 0.7); /* subtle glow */
+      box-shadow: 0 0 15px 4px rgba(100, 149, 237, 0.7);
       cursor: pointer;
       transition: box-shadow 0.3s ease;
     }
@@ -212,23 +198,23 @@
       box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
     }
 
-    /* Glitch effect keyframes */
+    /* Glitch effect keyframes extended to ~3 seconds */
     @keyframes glitch {
       0% {
         transform: none;
         filter: none;
       }
-      20% {
+      10% {
         transform: skew(-2deg, 2deg);
         filter: contrast(1.2) hue-rotate(-10deg);
       }
-      40% {
+      20% {
         transform: skew(2deg, -2deg);
         filter: contrast(0.8) hue-rotate(10deg);
       }
-      60% {
-        transform: none;
-        filter: none;
+      30% {
+        transform: skew(-1deg, 1deg);
+        filter: blur(1px);
       }
       100% {
         transform: none;
@@ -236,11 +222,11 @@
       }
     }
 
-    /* Class to trigger glitch effect */
+    /* Class to trigger glitch effect with longer duration */
     .glitch {
-      animation: glitch 0.3s steps(2, start) forwards;
-    }
-    </style>
+      animation: glitch 3s ease-in-out forwards;
+    } 
+</style>
 </head>
 <body>
    <div id="initial-screen">
