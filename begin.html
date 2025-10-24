@@ -198,7 +198,48 @@
     #cafe-video:hover {
       box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
     }
-  
+ #cafe-video {
+      width: 200px;
+      height: auto;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 15px 4px rgba(100, 149, 237, 0.7); /* subtle glow */
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+
+    #cafe-video:hover {
+      box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
+    }
+
+    /* Glitch effect keyframes */
+    @keyframes glitch {
+      0% {
+        transform: none;
+        filter: none;
+      }
+      20% {
+        transform: skew(-2deg, 2deg);
+        filter: contrast(1.2) hue-rotate(-10deg);
+      }
+      40% {
+        transform: skew(2deg, -2deg);
+        filter: contrast(0.8) hue-rotate(10deg);
+      }
+      60% {
+        transform: none;
+        filter: none;
+      }
+      100% {
+        transform: none;
+        filter: none;
+      }
+    }
+
+    /* Class to trigger glitch effect */
+    .glitch {
+      animation: glitch 0.3s steps(2, start) forwards;
+    }
     </style>
 </head>
 <body>
