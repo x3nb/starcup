@@ -304,6 +304,38 @@
     </div>
 
     <script>
+    const video = document.getElementById('cafe-video');
+
+    // Play video automatically, no loop
+    video.loop = false;
+
+    // Add click event for glitch effect
+    video.addEventListener('click', () => {
+      // Restart glitch animation
+      video.classList.remove('glitch');
+      
+      // Trigger reflow
+      void video.offsetWidth;
+      
+      // Add glitch class to start animation
+      video.classList.add('glitch');
+
+      // After 3 seconds, you can transition or perform an action
+      setTimeout(() => {
+        // For example, redirect to another page or reveal content
+        // window.location.href = 'your-website.html';
+
+        // Or fade out the video and show the website content
+        // Here, just an example:
+        alert('Transitioning to website...');
+        // You can add code here to hide the video or redirect
+      }, 3000);
+    });
+
+    // Handle video end
+    video.onended = () => {
+      alert('Video finished!');
+    };
         const audio = document.getElementById('background-music');
         const chatbotModal = document.getElementById('chatbot-modal');
         const speedSlider = document.getElementById('speed-slider');
