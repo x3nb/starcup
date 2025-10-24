@@ -219,11 +219,12 @@
 <body>
    <div id="initial-screen">
     <div id="title-text">CHIMERA CATS CAFE</div>
-    <div id="video-container" onclick="playVideo()">
-      <video id="cafe-video" src="introvids/StarSipsCoffeezooms.mp4"></video>
-      <div id="begin-text">Begin</div>
-    </div>
+    <video id="cafe-video" src="introvids/StarSipsCoffeezooms.mp4" 
+           style="width:200px; height:auto; border-radius:50%; object-fit:cover; cursor:pointer;"
+           onclick="playVideo()"></video>
   </div>
+
+ 
 
     <div id="credits-container">
         <div id="credits-content">
@@ -294,7 +295,6 @@
         <button onclick="startChat()">Submit</button>
     </div>
 
-    <script>
 <script>
     function playVideo() {
       const video = document.getElementById('cafe-video');
@@ -374,7 +374,18 @@
                 document.getElementById('initial-screen').style.display = 'flex';
                 audio.pause();
             }, parseFloat(speedSlider.value) * 1000);
-        }
+        } 
+         <script>
+    function playVideo() {
+      const video = document.getElementById('cafe-video');
+      video.play();
+      
+      // Optional: do something after the video ends
+      video.onended = () => {
+        // For example, hide the video or show something else
+        alert('Video finished playing!');
+      };
+    }
     </script>
 </body>
 </html>
