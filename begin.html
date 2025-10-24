@@ -182,6 +182,23 @@
             0% { transform: translateY(100%); }
             100% { transform: translateY(-100%); }
         }
+        
+    /* Optional: Add a smooth glow animation or static glow */
+    #cafe-video {
+      width: 200px;
+      height: auto;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 15px 4px rgba(100, 149, 237, 0.7); /* Cornflower blue glow */
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+
+    /* Optional: intensify glow on hover for subtle effect */
+    #cafe-video:hover {
+      box-shadow: 0 0 20px 6px rgba(100, 149, 237, 1);
+    }
+  
     </style>
 </head>
 <body>
