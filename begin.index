@@ -260,6 +260,20 @@
     </div>
 
     <script>
+<script>
+    function playVideo() {
+      const video = document.getElementById('cafe-video');
+      video.play();
+
+      // Optional: hide the "Begin" text after clicking
+      document.getElementById('begin-text').style.display = 'none';
+
+      // Do something after the video ends
+      video.onended = () => {
+        alert('Video finished playing!');
+      };
+    }
+  
         const audio = document.getElementById('background-music');
         const chatbotModal = document.getElementById('chatbot-modal');
         const speedSlider = document.getElementById('speed-slider');
