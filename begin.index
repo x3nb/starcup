@@ -5,7 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chimera Cats Cafe</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Lora:wght@400;700&display=swap" rel="stylesheet">
-    <style>
+    
+<style>
+    #video-container {
+      position: relative;
+      width: 200px; /* same as video width */
+      height: 200px; /* same as video height */
+      display: inline-block;
+    }
+
+    #cafe-video {
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    #begin-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Pacifico', cursive;
+      font-size: 2em;
+      font-weight: bold;
+      background: linear-gradient(45deg, cornflowerblue, purple);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
         body {
             margin: 0;
             padding: 0;
