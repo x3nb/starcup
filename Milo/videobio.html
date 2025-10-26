@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Milo — The Taoist Gardener</title>
+<style>
+body {
+  margin: 0;
+  background: #000;
+  color: cornflowerblue;
+  font-family: 'Cinzel', serif;
+  overflow: hidden;
+}
+
+#petal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Scrollable content container */
+.scroll-area {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 4rem;
+}
+
+/* Milo portrait header */
+.header {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.profile-img {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  box-shadow: 0 0 40px cornflowerblue;
+  animation: glowPulse 6s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  from { box-shadow: 0 0 25px #4169e1; }
+  to { box-shadow: 0 0 60px #87cefa; }
+}
+
+/* Bio card */
+.bio-section {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: rgba(10, 10, 10, 0.7);
+  border: 1px solid #1e90ff;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+}
+
+.bio-section h2 {
+  background: linear-gradient(to right, grey, cornflowerblue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* Dynamic video area */
+.video-container {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+  opacity: 0;
+  transform: translateY(80px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.video-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.video-container iframe {
+  width: 560px;
+  height: 315px;
+  border-radius: 12px;
+  border: 1px solid cornflowerblue;
+  box-shadow: 0 0 20px #4169e1;
+}
+
+/* Chat button */
+.chat-link {
+  display: block;
+  text-align: center;
+  margin: 3rem auto;
+  width: fit-content;
+  text-decoration: none;
+  color: #87cefa;
+  border: 1px solid #87cefa;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.chat-link:hover {
+  background: cornflowerblue;
+  color: #000;
+  box-shadow: 0 0 20px #87cefa;
+}
+
+/* Audio button */
+.audio-controls {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+}
+
+#mute-toggle {
+  background: none;
+  border: 1px solid cornflowerblue;
+  color: cornflowerblue;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#mute-toggle:hover {
+  background: cornflowerblue;
+  color: #000;
+}
+
+/* Petal animation */
+.petal {
+  position: absolute;
+  top: -10vh;
+  color: rgba(135, 206, 250, 0.8);
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div id="petal-container"></div>
+
+<div class="audio-controls">
+  <button id="mute-toggle">🔊</button>
+</div>
+<audio id="ambient-audio" src="milo-garden.mp3" autoplay loop></audio>
+
+<div class="scroll-area">
+  <div class="header">
+    <img src="milo-profile.jpg" alt="Milo portrait" class="profile-img">
+  </div>
+
+  <div class="bio-section">
+    <h2>Milo — The Taoist Gardener</h2>
+    <p><strong>Role:</strong> Herbalist • Philosopher • Keeper of Yeshua’s Garden</p>
+    <p><strong>Element:</strong> Earth and Wind</p>
+    <p><strong>Theme:</strong> Deep cello with guzheng and night chimes</p>
+    <p>
+      In the heart of Yeshua’s garden, where moonlight drips like honey over dew-soaked leaves, lives <strong>Milo</strong> — 
+      the quiet philosopher of the Chimera Cats Café. He speaks rarely, but when he does, his words feel like still water — calm, ancient, and impossibly deep.
+    </p>
+
+    <div class="video-container" id="videoGreeting">
+      <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+        title="Milo’s Greeting" 
+        frameborder="0" 
+        allowfullscreen></iframe>
+    </div>
+
+    <p>
+      Once the eldest of the lab-born kin, Milo bore his captivity with silent endurance. While others dreamed of escape, 
+      he sought meaning even in chains. Yeshua saw that patience — that glimmer of peace within pain — and freed him not just from the lab, 
+      but from the endless hunger of the world.
+    </p>
+    <p>
+      Now Milo tends to the living things that grow between shadow and starlight — roots, herbs, moss, and mystery. 
+      His garden is a living scripture: healing in fragrance, balance in color, and silence that sings.
+    </p>
+    <blockquote class="bio-quote">“To heal is to remember what was never broken.” — Milo</blockquote>
+  </div>
+
+  <a href="https://yourchatlink.com" target="_blank" class="chat-link">🌿 Chat with Milo</a>
+</div>
+
+<script>
+// --- Audio control ---
+const audio = document.getElementById("ambient-audio");
+const muteToggle = document.getElementById("mute-toggle");
+muteToggle.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteToggle.textContent = audio.muted ? "🔇" : "🔊";
+});
+window.addEventListener("click", () => { if (audio.paused) audio.play(); });
+
+// --- Petal animation ---
+const petalContainer = document.getElementById("petal-container");
+const petalChars = ["❀", "✿", "❃", "❊"];
+function createPetal() {
+  const p = document.createElement("div");
+  p.className = "petal";
+  p.textContent = petalChars[Math.floor(Math.random() * petalChars.length)];
+  p.style.left = Math.random() * 100 + "vw";
+  p.style.fontSize = (0.8 + Math.random() * 1.4) + "rem";
+  p.style.animationDuration = (10 + Math.random() * 10) + "s";
+  petalContainer.appendChild(p);
+  setTimeout(() => p.remove(), 20000);
+}
+setInterval(createPetal, 700);
+
+// --- Video fade-in on scroll ---
+const video = document.getElementById("videoGreeting");
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      video.classList.add("visible");
+    }
+  });
+}, { threshold: 0.3 });
+observer.observe(video);
+</script>
+
+</body>
+</html>
