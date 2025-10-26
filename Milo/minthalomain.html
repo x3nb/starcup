@@ -23,12 +23,15 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    border: 4px solid gold;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+    border: 3px solid rgba(152, 255, 204, 0.8);
+    box-shadow:
+      0 0 35px 10px rgba(152, 255, 204, 0.5),
+      inset 0 0 35px 10px rgba(152, 255, 204, 0.4);
+    animation: mintPulse 8s ease-in-out infinite;
   }
 
   h1 {
-    color: gold;
+    color: #9fffd1;
     font-size: 2.2em;
     margin-top: 20px;
   }
@@ -44,30 +47,30 @@
     width: 320px;
     height: 320px;
     border-radius: 50%;
-    border: 4px solid gold;
+    border: 3px solid rgba(152, 255, 204, 0.9);
     box-shadow:
-      0 0 25px 8px rgba(255, 215, 0, 0.5), /* outer gold glow */
-      inset 0 0 45px 12px rgba(152, 255, 204, 0.6); /* mint inner glow */
-    background: radial-gradient(circle at center, #222 30%, #000);
+      0 0 40px 12px rgba(152, 255, 204, 0.6),
+      inset 0 0 60px 20px rgba(152, 255, 204, 0.7);
+    background: radial-gradient(circle at center, #1a1a1a 30%, #000);
     object-fit: cover;
-    animation: goldenPulse 6s ease-in-out infinite;
+    animation: mintPulse 8s ease-in-out infinite;
   }
 
-  @keyframes goldenPulse {
+  @keyframes mintPulse {
     0% {
       box-shadow:
-        0 0 25px 8px rgba(255, 215, 0, 0.5),
-        inset 0 0 45px 12px rgba(152, 255, 204, 0.5);
+        0 0 40px 10px rgba(152, 255, 204, 0.5),
+        inset 0 0 50px 15px rgba(152, 255, 204, 0.4);
     }
     50% {
       box-shadow:
-        0 0 60px 12px rgba(255, 235, 150, 0.8),
-        inset 0 0 60px 15px rgba(152, 255, 204, 0.8);
+        0 0 70px 20px rgba(152, 255, 204, 0.9),
+        inset 0 0 80px 25px rgba(152, 255, 204, 0.8);
     }
     100% {
       box-shadow:
-        0 0 25px 8px rgba(255, 215, 0, 0.5),
-        inset 0 0 45px 12px rgba(152, 255, 204, 0.5);
+        0 0 40px 10px rgba(152, 255, 204, 0.5),
+        inset 0 0 50px 15px rgba(152, 255, 204, 0.4);
     }
   }
 
@@ -76,7 +79,7 @@
     margin: 0 auto;
     padding: 0 20px 80px;
     line-height: 1.7;
-    font-size: 1.1em; 
+    font-size: 1.1em;
   }
 
   .content a {
@@ -86,16 +89,17 @@
   }
 
   .content a:hover {
-    color: gold;
+    color: #9fffd1;
   }
 
+  /* Petal animation */
   .petal {
     position: fixed;
     top: -10px;
     width: 14px;
     height: 14px;
-    background: radial-gradient(circle, #f4c2c2 0%, #ffb6c1 60%, transparent 100%);
-    opacity: 0.9;
+    background: radial-gradient(circle, #c8ffe3 0%, #9fffd1 60%, transparent 100%);
+    opacity: 0.8;
     border-radius: 50%;
     animation: drift 14s linear infinite;
     pointer-events: none;
@@ -111,18 +115,19 @@
 
 <body>
 <header>
-  <img src="https://your-image-url-here.jpg" alt="Milo the Taoist Gardener">
+  <img src="intro.Herbsgreetings.mp4" alt="Milo the Taoist Gardener">
   <h1>Milo — The Taoist Gardener</h1>
 </header>
 
 <div class="video-container">
-  <iframe src="intro.Herbsgreetings.mp4" 
+  <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=0&mute=0" 
           title="Milo's Greeting" frameborder="0" 
           allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <div class="content">
   <p><strong>“The soil remembers what the stars forget.”</strong></p>
+
   <p>
     Once the eldest among the Chimera Cats, <strong>Milo</strong> carries a serenity born from time spent 
     beneath starlit branches and the whispers of living water.  
@@ -142,16 +147,18 @@
 </div>
 
 <script>
-  const petalCount = 18;
+  // Petal drift effect
+  const petalCount = 20;
   for (let i = 0; i < petalCount; i++) {
     const petal = document.createElement('div');
     petal.className = 'petal';
     petal.style.left = Math.random() * 100 + 'vw';
-    petal.style.animationDuration = 10 + Math.random() * 10 + 's';
+    petal.style.animationDuration = 12 + Math.random() * 10 + 's';
     petal.style.animationDelay = Math.random() * 10 + 's';
-    petal.style.opacity = Math.random() * 0.8 + 0.4;
     document.body.appendChild(petal);
   }
 </script>
+
 </body>
 </html>
+
