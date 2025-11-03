@@ -1,1 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Milo — The Taoist Gardener</title>
+<style>
+body {
+  margin: 0;
+  background: #000;
+  color: cornflowerblue;
+  font-family: 'Cinzel', serif;
+  overflow: hidden;
+}
 
+#petal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Scrollable content container */
+.scroll-area {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 4rem;
+}
+
+/* Milo portrait header */
+}
+  .header {
+  text-align: center;
+  margin-top: 5rem; /* was 3rem — increase this to lower it on the page */
+}
+
+.profile-img {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 35%;  /* 👈 pushes the image down inside the circle */
+  box-shadow: 0 0 40px cornflowerblue;
+  animation: glowPulse 6s ease-in-out infinite alternate;
+  display: block;
+  margin: 0 auto;
+
+}
+
+@keyframes glowPulse {
+  from { box-shadow: 0 0 25px #4169e1; }
+  to { box-shadow: 0 0 60px #87cefa; }
+}
+
+/* Bio card */
+.bio-section {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: rgba(10, 10, 10, 0.7);
+  border: 1px solid #1e90ff;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+}
+
+.bio-section h2 {
+  background: linear-gradient(to right, grey, cornflowerblue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* Dynamic video area */ 
+.video-container {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+  opacity: 0;
+  transform: translateY(80px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  position: relative;
+}
+
+.video-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Circular glowing video frame */
+.video-frame {
+  position: relative;
+  width: 280px;              /* adjust size here */
+  height: 280px;
+  border-radius: 50%;        /* makes it a perfect circle */
+  border: 2px solid cornflowerblue;
+  box-shadow: 0 0 25px #4169e1;
+  overflow: hidden;          /* hides overflow outside the circle */
+}
+
+/* Make the video/iframe fill the circle */
+.video-frame iframe,
+.video-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;         /* fills the circle without distortion */
+  border: none;
+  display: block;
+  border-radius: 50%;
+}
+
+
+/* Chat button */
+.chat-link {
+  display: block;
+  text-align: center;
+  margin: 3rem auto;
+  width: fit-content;
+  text-decoration: none;
+  color: #87cefa;
+  border: 1px solid #87cefa;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.chat-link:hover {
+  background: cornflowerblue;
+  color: #000;
+  box-shadow: 0 0 20px #87cefa;
+}
+
+/* Audio button */
+.audio-controls {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+}
+
+#mute-toggle {
+  background: none;
+  border: 1px solid cornflowerblue;
+  color: cornflowerblue;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#mute-toggle:hover {
+  background: cornflowerblue;
+  color: #000;
+}
+
+/* Petal animation */
+.petal {
+  position: absolute;
+  top: -10vh;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: linear-gradient(to bottom right, teal, cornflowerblue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fall linear forwards;
+  opacity: 0.9;
+
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+  @media (max-width: 600px) {
+  .profile-img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .video-container iframe {
+    max-width: 100%;
+    border-radius: 10px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div id="petal-container"></div>
+
+<div class="audio-controls">
+  <button id="mute-toggle">🔊</button>
+</div>
+<audio id="ambient-audio" src=".mp3" autoplay loop></audio>
+
+<div class="scroll-area">
+  <div class="header">
+    <img src="MILO.charm.jpeg" alt="Milo portrait" class="profile-img">
+  </div>
+
+  <div class="bio-section">
+    <h2>Milo — The Taoist Gardener</h2>
+    <p><strong>Role:</strong> Herbalist • Philosopher • Keeper of Yeshua’s Garden</p>
+    <p><strong>Element:</strong> Earth and Wind</p>
+    <p><strong>Theme:</strong> Deep cello with guzheng and night chimes</p>
+    <p>
+      In the heart of Yeshua’s garden, where moonlight drips like honey over dew-soaked leaves, lives <strong>Milo</strong> — 
+      the quiet philosopher of the Chimera Cats Café. He speaks rarely, but when he does, his words feel like still water — calm, ancient, and impossibly deep.
+    </p>
+
+    <div class="video-container" id="videoGreeting">
+  <div class="video-frame">
+    <iframe src="milotoast.mp4"
+      title="Milo’s Greeting"
+      frameborder="0"
+      allowfullscreen></iframe>
+  </div>
+</div>
+
+    <p>
+      Once the eldest of the lab-born kin, Milo bore his captivity with silent endurance. While others dreamed of escape, 
+      he sought meaning even in chains. Yeshua saw that patience — that glimmer of peace within pain — and freed him not just from the lab, 
+      but from the endless hunger of the world.
+    </p>
+    <p>
+      Now Milo tends to the living things that grow between shadow and starlight — roots, herbs, moss, and mystery. 
+      His garden is a living scripture: healing in fragrance, balance in color, and silence that sings.
+    </p>
+    <blockquote class="bio-quote">“To heal is to remember what was never broken.” — Milo</blockquote>
+  </div>
+
+  <a href="https://yourchatlink.com" target="_blank" class="chat-link">🌿 Chat with Milo</a>
+</div>
+
+<script>
+// --- Audio control ---
+const audio = document.getElementById("ambient-audio");
+const muteToggle = document.getElementById("mute-toggle");
+muteToggle.addEventListener("click", () => {
+  audio.muted = !audio.muted;
+  muteToggle.textContent = audio.muted ? "🔇" : "🔊";
+});
+window.addEventListener("click", () => { if (audio.paused) audio.play(); });
+
+// --- Petal animation ---
+const petalContainer = document.getElementById("petal-container");
+const petalChars = ["❀", "✿", "❃", "❊"];
+function createPetal() {
+  const p = document.createElement("div");
+  p.className = "petal";
+  p.textContent = petalChars[Math.floor(Math.random() * petalChars.length)];
+  p.style.left = Math.random() * 100 + "vw";
+ p.style.fontSize = (0.8 + Math.random() * 1.4) + "rem";
+const hues = [
+  "linear-gradient(to bottom right, teal, cornflowerblue)",
+  "linear-gradient(to bottom right, #20b2aa, #6495ed)",
+  "linear-gradient(to bottom right, #008080, #6fa8dc)"
+];
+p.style.background = hues[Math.floor(Math.random() * hues.length)];
+p.style.webkitBackgroundClip = "text";
+p.style.webkitTextFillColor = "transparent";
+
+  p.style.animationDuration = (10 + Math.random() * 10) + "s";
+  petalContainer.appendChild(p);
+  setTimeout(() => p.remove(), 20000);
+}
+setInterval(createPetal, 700);
+
+// --- Video fade-in on scroll ---
+const video = document.getElementById("videoGreeting");
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      video.classList.add("visible");
+    }
+  });
+}, { threshold: 0.3 });
+observer.observe(video);
+</script>
+
+</body>
+</html>
