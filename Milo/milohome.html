@@ -76,7 +76,7 @@ body {
   text-align: center;
 }
 
-/* Dynamic video area */
+/* Dynamic video area */ 
 .video-container {
   display: flex;
   justify-content: center;
@@ -92,16 +92,30 @@ body {
   transform: translateY(0);
 }
 
+/* Fix: perfectly framed video */
 .video-container iframe {
-  aspect-ratio: 16 / 9;      /* ensures perfect 16:9 ratio */
+  aspect-ratio: 16 / 9;
   width: 100%;
   max-width: 560px;
   height: auto;
+  border: none; /* remove default iframe border */
+  display: block;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #4169e1;
+  overflow: hidden; /* ensures no gaps */
+}
+
+/* Optional: outer decorative frame */
+.video-container::before {
+  content: "";
+  position: absolute;
+  width: calc(100% - 2px);
+  max-width: 562px;
+  aspect-ratio: 16 / 9;
   border-radius: 12px;
   border: 1px solid cornflowerblue;
-  box-shadow: 0 0 20px #4169e1;
-  object-fit: cover;         /* ensures clean fit if using a video file */
-  background-color: #000;    /* avoids visual gaps */
+  box-shadow: 0 0 20px #4169e1 inset;
+  pointer-events: none;
 
 }
 
