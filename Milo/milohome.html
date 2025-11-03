@@ -246,7 +246,16 @@ function createPetal() {
   p.className = "petal";
   p.textContent = petalChars[Math.floor(Math.random() * petalChars.length)];
   p.style.left = Math.random() * 100 + "vw";
-  p.style.fontSize = (0.8 + Math.random() * 1.4) + "rem";
+ p.style.fontSize = (0.8 + Math.random() * 1.4) + "rem";
+const hues = [
+  "linear-gradient(to bottom right, teal, cornflowerblue)",
+  "linear-gradient(to bottom right, #20b2aa, #6495ed)",
+  "linear-gradient(to bottom right, #008080, #6fa8dc)"
+];
+p.style.background = hues[Math.floor(Math.random() * hues.length)];
+p.style.webkitBackgroundClip = "text";
+p.style.webkitTextFillColor = "transparent";
+
   p.style.animationDuration = (10 + Math.random() * 10) + "s";
   petalContainer.appendChild(p);
   setTimeout(() => p.remove(), 20000);
