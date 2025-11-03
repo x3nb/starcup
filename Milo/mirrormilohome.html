@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Milo — The Taoist Gardener</title>
 <style>
+/* ---------------------- Global ---------------------- */
 body {
   margin: 0;
   background: #000;
@@ -13,6 +14,7 @@ body {
   overflow: hidden;
 }
 
+/* Petal container */
 #petal-container {
   position: fixed;
   top: 0;
@@ -23,7 +25,7 @@ body {
   pointer-events: none;
 }
 
-/* Scrollable content container */
+/* Scrollable content */
 .scroll-area {
   position: relative;
   z-index: 2;
@@ -33,15 +35,15 @@ body {
   padding-bottom: 4rem;
 }
 
-/* Milo portrait header */
-  .header {
+/* ---------------------- Avatar ---------------------- */
+.header {
   text-align: center;
-  margin-top: 6rem;  /* gently lowers the top portrait */
+  margin-top: 6rem;  /* lowered the avatar */
   margin-bottom: 3rem;
 }
 
 .profile-img {
-  width: 280px;              /* match video size */
+  width: 280px;             /* match video circle */
   height: 280px;
   border-radius: 50%;
   object-fit: cover;
@@ -50,15 +52,15 @@ body {
   animation: glowPulse 6s ease-in-out infinite alternate;
   display: block;
   margin: 0 auto;
-
 }
 
+/* Glow animation for avatar */
 @keyframes glowPulse {
   from { box-shadow: 0 0 25px #4169e1; }
   to { box-shadow: 0 0 60px #87cefa; }
 }
 
-/* Bio card */
+/* ---------------------- Bio Section ---------------------- */
 .bio-section {
   max-width: 800px;
   margin: 3rem auto;
@@ -77,9 +79,26 @@ body {
   text-align: center;
 }
 
- .video-frame {
+/* ---------------------- Circular Video ---------------------- */
+.video-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 5rem;   /* balanced spacing below avatar */
+  margin-bottom: 5rem;
+  opacity: 0;
+  transform: translateY(80px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
   position: relative;
-  width: 280px;
+}
+
+.video-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.video-frame {
+  position: relative;
+  width: 280px;          /* same as avatar */
   height: 280px;
   border-radius: 50%;
   border: 2px solid cornflowerblue;
@@ -88,7 +107,7 @@ body {
   animation: glowPulseVideo 6s ease-in-out infinite alternate;
 }
 
-/* ✨ Soft inner glow overlay */
+/* Inner seafoam-green glow */
 .video-frame::before {
   content: "";
   position: absolute;
@@ -96,15 +115,16 @@ body {
   border-radius: 50%;
   background: radial-gradient(
     circle at 50% 60%,
-    rgba(144, 238, 200, 0.25),  /* soft seafoam core */
-    rgba(0, 0, 0, 0.15) 70%     /* fades smoothly to dark edge */
+    rgba(144, 238, 200, 0.25),
+    rgba(0, 0, 0, 0.15) 70%
   );
-  filter: blur(12px);           /* Gaussian softness */
-  pointer-events: none;         /* doesn’t block clicks or video */
+  filter: blur(12px);
+  pointer-events: none;
   z-index: 2;
+  animation: seafoamGlow 10s ease-in-out infinite;
 }
 
-/* Keep the actual video below the glow overlay */
+/* Video content inside circle */
 .video-frame iframe,
 .video-frame video {
   width: 100%;
@@ -117,9 +137,20 @@ body {
   z-index: 1;
 }
 
+/* Glow animation for video frame */
+@keyframes glowPulseVideo {
+  from { box-shadow: 0 0 25px #4169e1; }
+  to { box-shadow: 0 0 60px #87cefa; }
+}
 
+/* Seafoam breathing animation */
+@keyframes seafoamGlow {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.3; }
+}
 
-/* Chat button */
+/* ---------------------- Chat Button ---------------------- */
 .chat-link {
   display: block;
   text-align: center;
@@ -139,7 +170,7 @@ body {
   box-shadow: 0 0 20px #87cefa;
 }
 
-/* Audio button */
+/* ---------------------- Audio Button ---------------------- */
 .audio-controls {
   position: fixed;
   top: 1.5rem;
@@ -164,28 +195,17 @@ body {
   color: #000;
 }
 
-/* Petal animation */
+/* ---------------------- Petal Animation ---------------------- */
 .petal {
   position: absolute;
   top: -10vh;
-  font-weight: bold;
-  font-size: 1.2rem;
-  background: linear-gradient(to bottom right, teal, cornflowerblue);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: rgba(135, 206, 250, 0.8);
   animation: fall linear forwards;
-  opacity: 0.9;
-
-}
-@keyframes seafoamGlow {
-  0% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-  100% { opacity: 0.3; }
 }
 
-.video-frame::before {
-  animation: seafoamGlow 10s ease-in-out infinite;
-
+@keyframes fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
 </style>
