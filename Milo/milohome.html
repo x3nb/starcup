@@ -79,6 +79,7 @@ body {
 .video-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   margin: 3rem 0;
   opacity: 0;
   transform: translateY(80px);
@@ -91,11 +92,16 @@ body {
 }
 
 .video-container iframe {
-  width: 560px;
-  height: 315px;
+  aspect-ratio: 16 / 9;      /* ensures perfect 16:9 ratio */
+  width: 100%;
+  max-width: 560px;
+  height: auto;
   border-radius: 12px;
   border: 1px solid cornflowerblue;
   box-shadow: 0 0 20px #4169e1;
+  object-fit: cover;         /* ensures clean fit if using a video file */
+  background-color: #000;    /* avoids visual gaps */
+
 }
 
 /* Chat button */
