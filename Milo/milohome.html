@@ -80,11 +80,11 @@ body {
 .video-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   margin: 3rem 0;
   opacity: 0;
   transform: translateY(80px);
   transition: opacity 1.2s ease, transform 1.2s ease;
+  position: relative;
 }
 
 .video-container.visible {
@@ -92,17 +92,25 @@ body {
   transform: translateY(0);
 }
 
-/* Fix: perfectly framed video */
-.video-container iframe {
-  aspect-ratio: 16 / 9;
-  width: 100%;
+/* FRAME ONLY THE VIDEO */
+.video-frame {
+  position: relative;
+  border: 2px solid cornflowerblue;
+  border-radius: 14px;
+  box-shadow: 0 0 25px #4169e1;
+  overflow: hidden; /* ensures the video fits perfectly inside */
   max-width: 560px;
-  height: auto;
-  border: none; /* remove default iframe border */
+  aspect-ratio: 16 / 9;
+}
+
+/* The actual video (iframe or video tag) fits the frame exactly */
+.video-frame iframe,
+.video-frame video {
+  width: 100%;
+  height: 100%;
   display: block;
-  border-radius: 12px;
-  box-shadow: 0 0 20px #4169e1;
-  overflow: hidden; /* ensures no gaps */
+  border: none;
+  object-fit: cover;
 }
 
 /* Optional: outer decorative frame */
