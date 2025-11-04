@@ -96,7 +96,14 @@
   object-position: 50% 30%; /* horizontal 50%, vertical 30% to shift the video up */
   border-radius: 50%;
 }
+.video-frame {
+  animation: gentleMove 6s ease-in-out infinite alternate;
+}
 
+@keyframes gentleMove {
+  0% { transform: scale(1) translateY(0); }
+  100% { transform: scale(1.03) translateY(-4px); }
+}
 
     iframe {
       width: 100%;
