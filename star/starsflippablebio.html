@@ -78,6 +78,7 @@
       justify-content: flex-start;
       padding-top: 25px;
     }
+
     .video-frame {
       width: 200px;
       height: 200px;
@@ -88,11 +89,11 @@
                   0 0 30px rgba(210, 160, 255, 0.5);
       background: radial-gradient(circle, rgba(180,100,255,0.3), rgba(110,60,180,0.15));
     }
-    .video-frame video {
+  .video-frame video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transform: scale(1.2); /* zooms in on the video */
+  object-fit: cover;      /* fills the frame while maintaining aspect ratio */
+  object-position: 50% 30%; /* horizontal 50%, vertical 30% to shift the video up */
   border-radius: 50%;
 }
 
@@ -184,12 +185,12 @@
     <div class="card-container" onclick="flipCard()">
       <div class="character-card" id="starCard">
         <!-- Front Side -->
-        
+        <div class="card-side front">
           <div class="video-frame">
-  <video src="Starmystery.mp4" autoplay loop muted playsinline></video>
+  <video id="starVideo" src="Starmystery.mp4" playsinline></video>
+  <button id="playBtn" style="display:none;">🔊 Hear Greeting Again</button>
 </div>
 
-          
           <h1>Star — The Heir of the Café</h1>
 
           <div class="stats">
