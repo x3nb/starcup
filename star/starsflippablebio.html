@@ -286,7 +286,10 @@ Object.defineProperty(HTMLMediaElement.prototype, 'playing', {
     return !!(this.currentTime > 0 && !this.paused && !this.ended && this.readyState > 2);
   }
 });
-
+window.addEventListener('load', () => {
+  video.muted = true; // silent movement
+  video.play();
+});
   </script>
 </body>
 </html>
